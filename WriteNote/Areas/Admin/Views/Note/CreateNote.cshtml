@@ -1,0 +1,179 @@
+﻿@{
+    ViewBag.Title = "Tạo nhật ký mới";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container p-t-20">
+    <div class="card">
+        <div class="card-header">
+            <strong>Thêm mới một nhật ký</strong>
+        </div>
+        <div class="card-body card-block">
+            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return false;">
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputUser" class=" form-control-label">Người dùng</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <select name="inputUser" id="inputUser" class="form-control">
+                            @foreach (var i in ViewData["listUser"] as IEnumerable<WriteNote.Models.ViewModels.UserViewModel>)
+                            {
+                                <option value="@i.UserID">@i.Email</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputNotebook" class=" form-control-label">Sổ tay</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <select name="inputNotebook" id="inputNotebook" class="form-control">
+                        </select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputTitle" class=" form-control-label">Tiêu đề</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputTitle" name="inputTitle" placeholder="Tiêu đề" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputBody" class=" form-control-label">Nội dung</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <textarea id="inputBody" name="inputBody"></textarea>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary btn-sm" id="create-note">
+                <i class="fa fa-dot-circle-o"></i> Tạo mới
+            </button>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script src="//cdn.ckeditor.com/4.11.3/standard/ckeditor.js"></script>
+    <script>
+        "use strict";
+        var errorMessage = function (element, text) {
+            let wrapper = $(".card-body " + element);
+            $(wrapper).find(".animate-alert").remove();
+            if (!$(wrapper).find(".animate-alert").length) {
+                $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">" + text + "</div>"));
+            }
+            else {
+                $(wrapper).find(".animate-alert").remove();
+            }
+        }
+
+        var wrapper = $(".card-body");
+        $(document).ready(function () {
+            $("#create-note").on("click", function (e) {
+                e.preventDefault();
+                $(wrapper).find(".animate-alert").remove();
+
+                for (var instanceName in CKEDITOR.instances) {
+                    CKEDITOR.instances[instanceName].updateElement();
+                }
+
+                var inputUserID = $("#inputUser").find('option:selected').val();
+                var inputNotebookID = $("#inputNotebook").find('option:selected').val();
+                var inputTitle = $("#inputTitle").val();
+                var inputBody = $("#inputBody").val();
+
+                if (inputUserID == null) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputUser", "Người dùng chưa được chọn")
+                    return false;
+                }
+                else if (inputNotebookID == null) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputNotebook", "Sổ tay chưa được chọn");
+                    return false;
+                }
+                else if (inputTitle.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputTitle", "Tiêu đê không được để trống");
+                    return false;
+                }
+                else if (inputBody.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputBody", "Nội dung không được để trống");
+                    return false;
+                }
+                else {
+                    var encode_body = escape(inputBody);
+                    $(wrapper).find(".animate-alert").remove();
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Admin/Note/CreateNote",
+                        data: { "UserID": inputUserID, "NotebookID": inputNotebookID, "Title": inputTitle, "Body": encode_body },
+                        success: function (response) {
+                            if (response.status == true) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Tạo nhật ký thành công",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Admin/Note"
+                                })
+                            }
+                            else {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Có lỗi, vui lòng thử lại...",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        }
+                    })
+                    return false;
+                }
+            })
+        });
+
+        $("select#inputUser").on('change', function (e) {
+            $("select#inputNotebook").find("option").remove();
+            e.preventDefault();
+            var UserID = $(this).val();
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Note/GetNotebook",
+                data: { "UserID": UserID },
+                success: function (response) {
+                    if (response.status == true) {
+                        $.each(response.data, function (i) {
+                            $("select#inputNotebook").append(new Option(response.data[i].Title, response.data[i].NotebookID));
+                        })
+                    }
+                    else {
+                        $.each(response.data, function (i) {
+                            $("select#inputNotebook").append(new Option("Chưa có sổ tay", 0));
+                        })
+                    }
+                }
+            })
+            return false;
+        });
+
+        CKEDITOR.replace('inputBody', {
+            language: 'en',
+            height: 100,
+            toolbarCanCollapse: true
+        });
+    </script>
+}

@@ -1,0 +1,218 @@
+﻿
+@{
+    ViewBag.Title = "Chỉnh sửa người dùng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    string userID;
+
+    try
+    {
+        userID = Html.ViewContext.RouteData.Values["id"].ToString();
+    }
+    catch (Exception)
+    {
+        userID = "";
+    }
+}
+<div class="container p-t-20">
+    <div class="card">
+        <div class="card-header">
+            <strong>Cập nhật thông tin</strong>
+        </div>
+        <div class="card-body card-block">
+            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return false;">
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputUsername" class=" form-control-label">USERNAME</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputUsername" name="inputUsername" placeholder="USERNAME" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputPassword" class=" form-control-label">PASSWORD</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="password" id="inputPassword" name="inputPassword" placeholder="Password" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputEmail" class=" form-control-label">Email</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputEmail" name="inputEmail" placeholder="Disabled" disabled="" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputDatetimeCreate" class=" form-control-label">DateTime Create</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputDatetimeCreate" name="inputDatetimeCreate" placeholder="Disabled" disabled="" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputFullname" class=" form-control-label">Fullname</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputFullname" name="inputFullname" placeholder="Fullname" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputRole" class=" form-control-label">Role</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <select name="inputRole" id="inputRole" class="form-control">
+                            @foreach (var i in ViewData["listRole"] as IEnumerable<WriteNote.Models.Role>)
+                            {
+                                <option value="@i.RoleID">@i.RoleName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputSubscription" class=" form-control-label">Subscription</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <select name="inputSubscription" id="inputSubscription" class="form-control">
+                            @foreach (var i in ViewData["listSubscription"] as IEnumerable<WriteNote.Models.Subscription>)
+                            {
+                                <option value="@i.SubscriptionID">@i.SubscriptionName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary btn-sm" id="update-user">
+                <i class="fa fa-dot-circle-o"></i> Cập nhật
+            </button>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        "use strict";
+        var errorMessage = function (element, text) {
+            let wrapper = $(".card-body " + element);
+            $(wrapper).find(".animate-alert").remove();
+            if (!$(wrapper).find(".animate-alert").length) {
+                $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">" + text + "</div>"));
+            }
+            else {
+                $(wrapper).find(".animate-alert").remove();
+            }
+        }
+        var wrapper = $(".card-body");
+        var UserID = '@userID';
+        $(document).ready(function () {
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/User/GetData",
+                data: { "UserID": UserID },
+                success: function (response) {
+                    if (response.status == true) {
+                        $.each(response.data, function (i) {
+                            var milli = response.data[i].DatetimeCreate.replace(/\/Date\((-?\d+)\)\//, '$1');
+                            var d = new Date(parseInt(milli));
+                            $(wrapper).find("input[id='inputUsername']").val(response.data[i].Username);
+                            $(wrapper).find("input[id='inputPassword']").val(response.data[i].Password);
+                            $(wrapper).find("input[id='inputEmail']").val(response.data[i].Email);
+                            $(wrapper).find("input[id='inputDatetimeCreate']").val(d);
+                            $(wrapper).find("input[id='inputFullname']").val(response.data[i].Fullname);
+                            $("#inputRole option[value=" + parseInt(response.data[i].RoleID) + "]").attr("selected", "selected");
+                            $("#inputSubscription option[value=" + parseInt(response.data[i].SubscriptionID) + "]").attr("selected", "selected");
+                        })
+                    }
+                    else {
+                        $(wrapper).append("<div class=\"col-12 col-lg-4\"><div class=\"card features\"><div class=\"card-body\"><div class=\"media\"><div class=\"media-body\"><h4 class=\"card-title\">Chưa có nhật ký nào cả</h4><p class=\"card-text\">Thêm mới một nhật ký</p></div></div></div></div></div>")
+                    }
+                }
+            })
+            return false;
+        });
+
+        $(document).ready(function () {
+            $("#update-user").on("click", function () {
+                $(wrapper).find(".animate-alert").remove();
+
+                var inputUsername = $("#inputUsername").val();
+                var inputFullname = $("#inputFullname").val();
+                var inputPassword = $("#inputPassword").val();
+                var inputRole = $("#inputRole").val();
+                var inputSubscription = $("#inputSubscription").val();
+
+                if (inputUsername.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputUsername", "Tên người dùng không được để trống")
+                    return false;
+                }
+                else if (inputFullname.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputFullname", "Tên đầy đủ không được để trống");
+                    return false;
+                }
+                else if (inputPassword.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputPassword", "Mật khẩu không được để trống");
+                    return false;
+                }
+                else if (inputPassword.length < 6) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputPassword", "Mật khẩu phải trên 6 ký tự.");
+                    return false;
+                }
+                else if (inputRole == 0) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errMessTwo("#inputRole", "Role không được để trống");
+                    return false;
+                }
+                else if (inputSubscription == 0) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errMessTwo("#inputSubscription", "Subscription không được để trống");
+                    return false;
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Admin/User/UpdateUser",
+                        data: { "UserID": UserID, "Username": inputUsername, "Fullname": inputFullname, "Password": inputPassword, "RoleID": inputRole, "SubscriptionID": inputSubscription },
+                        success: function (response) {
+                            if (response.status == true) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Cập nhật thành công",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Admin/User"
+                                })
+                            }
+                            else {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Người dùng không tồn tại",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        }
+                    })
+                    return false;
+                }
+            })
+        })
+    </script>
+}

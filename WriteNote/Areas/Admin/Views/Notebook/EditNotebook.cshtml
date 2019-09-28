@@ -1,0 +1,156 @@
+﻿@{
+    ViewBag.Title = "Chỉnh sửa sổ tay";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+
+    string notebookID;
+
+    try
+    {
+        notebookID = Html.ViewContext.RouteData.Values["id"].ToString();
+    }
+    catch (Exception)
+    {
+        notebookID = "";
+    }
+}
+<div class="container p-t-20">
+    <div class="card">
+        <div class="card-header">
+            <strong>Cập nhật sổ tay</strong>
+        </div>
+        <div class="card-body card-block">
+            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return false;">
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputEmail" class=" form-control-label">Người dùng</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputEmail" name="inputEmail" placeholder="Người dùng" disabled class="form-control">
+                        <input type="text" id="inputUserID" name="inputUserID" disabled class="form-control" hidden>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputTitle" class=" form-control-label">Tiêu đề</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputTitle" name="inputTitle" placeholder="Tiêu đề" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputDatetimeCreate" class=" form-control-label">Ngày tạo</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputDatetimeCreate" name="inputDatetimeCreate" disabled class="form-control">
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary btn-sm" id="update-notebook">
+                <i class="fa fa-dot-circle-o"></i> Cập nhật
+            </button>
+        </div>
+    </div>
+</div>
+
+
+@section scripts
+{
+    <script>
+        "use strict";
+        var NotebookID = '@notebookID';
+
+        var errorMessage = function (element, text) {
+            let wrapper = $(".card-body " + element);
+            $(wrapper).find(".animate-alert").remove();
+            if (!$(wrapper).find(".animate-alert").length) {
+                $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">" + text + "</div>"));
+            }
+            else {
+                $(wrapper).find(".animate-alert").remove();
+            }
+        }
+
+        $(document).ready(function () {
+            let wrapper = $(".card-body");
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Notebook/EditNotebook",
+                data: { "flag": true, "NotebookID": NotebookID },
+                success: function (response) {
+                    if (response.status == true) {
+                        $.each(response.data, function (i) {
+                            let datetimeCreate = new Date(parseInt(response.data[i].DatetimeCreate.replace(/\/Date\((-?\d+)\)\//, '$1')));
+                            //console.log(response.note[i].NotebookID)
+                            $(wrapper).find("input[id='inputEmail']").val(response.data[i].Email);
+                            $(wrapper).find("input[id='inputUserID']").val(response.data[i].UserID);
+                            $(wrapper).find("input[id='inputTitle']").val(response.data[i].Title);
+                            $(wrapper).find("input[id='inputDatetimeCreate']").val(datetimeCreate);
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            position: "center",
+                            type: "error",
+                            title: "Có lỗi, vui lòng thử lại...",
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                }
+            })
+            return false;
+        });
+
+        $(document).ready(function () {
+            $("#update-notebook").on("click", function (e) {
+                e.preventDefault();
+                $(wrapper).find(".animate-alert").remove();
+
+                var wrapper = $(".card-body");
+                var inputTitle = $("#inputTitle").val();
+                var inputUserID = $("#inputUserID").val();
+                if (inputTitle == null) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputTitle", "Tiêu đề không được để trống");
+                    return false;
+                }
+                else {
+                    $(wrapper).find(".animate-alert").remove();
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Admin/Notebook/UpdateNotebook",
+                        data: { "UserID": inputUserID, "NotebookID": NotebookID, "Title": inputTitle },
+                        success: function (response) {
+                            if (response.status == true) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Cập nhật sổ tay thành công",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Admin/Notebook"
+                                })
+                            }
+                            else {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Có lỗi, vui lòng thử lại...",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        }
+                    })
+                    return false;
+                }
+            })
+        });
+    </script>
+}

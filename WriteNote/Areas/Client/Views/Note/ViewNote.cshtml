@@ -1,0 +1,227 @@
+﻿
+@{
+    ViewBag.Title = "Xem nhật ký";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+
+    string noteID;
+
+    try
+    {
+        noteID = Html.ViewContext.RouteData.Values["id"].ToString();
+    }
+    catch (Exception)
+    {
+        noteID = "";
+    }
+}
+<div class="section pt-10 infoNote">
+    <div class="container">
+        <div class="section-title">
+            <h3>Một chút thông tin</h3>
+        </div>
+        <div class="row pt-4">
+        </div>
+    </div>
+</div>
+<div class="section light-bg">
+    <div class="container">
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#note">Ghi chú</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#edit">Thao tác</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="note">
+                <div class="d-flex flex-column">
+                    <div class="view-note">
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="edit">
+                <div class="d-flex flex-column">
+                    <div class="edit-note">
+                        <div class="md-form mt-3">
+                            <input type="text" id="inputTitle" name="inputTitle" class="form-control" autofocus>
+                            <label for="inputTitle">Tiêu đề</label>
+                        </div>
+                        <select class="browser-default custom-select" id="notebookID" name="notebookID">
+                            <option value="0">Chọn một sổ tay</option>
+                            @foreach (var i in ViewData["listNoteBook"] as IEnumerable<WriteNote.Models.NoteBook>)
+                            {
+                                <option value="@i.NotebookID">@i.Title</option>
+                            }
+                        </select>
+                        <hr />
+                        <textarea id="inputBody" name="inputBody"></textarea>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-lg-row">
+                    <button class="btn btn-primary" id="update-note">Cập nhật</button>
+                    <button class="btn btn-primary" id="delete-note">Xoá</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script src="//cdn.ckeditor.com/4.11.3/standard/ckeditor.js"></script>
+    <script>
+        "use strict";
+        var errorMessage = function (element, text) {
+            let wrapper = $(".edit-note>" + element);
+            $(wrapper).find(".animate-alert").remove();
+            if (!$(wrapper).find(".animate-alert").length) {
+                $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">" + text + "</div>"));
+            }
+            else {
+                $(wrapper).find(".animate-alert").remove();
+            }
+        }
+        var wrapper = $(".edit-note");
+        var noteID = parseInt("@noteID");
+        $(document).ready(function () {
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Client/Note/ViewNote",
+                data: { "noteID": noteID },
+                success: function (response) {
+                    if (response.status) {
+                        $.each(response.data, function (i) {
+                            let datetimeCreate = new Date(parseInt(response.data[i].DatetimeCreate.replace(/\/Date\((-?\d+)\)\//, '$1')));
+                            $(".infoNote .container .row").append("<div class=\"col-md-6\"><h4 class=\"mb-3\">Sổ tay</h4><p class=\"light-font mb-5\">" + response.data[i].NotebookName + "</p></div>");
+                            $(".infoNote .container .row").append("<div class=\"col-md-6\"><h4 class=\"mb-3\">Ngày tạo</h4><p class=\"light-font mb-5\">" + datetimeCreate + "</p></div>");
+                            $(".view-note").append("<h2>" + response.data[i].Title + "</h2><p>" + unescape(response.data[i].Body) + "</p>");
+                            $(".edit-note input[type='text']").val(response.data[i].Title);
+                            CKEDITOR.instances.inputBody.setData(unescape(response.data[i].Body));
+                            $("#notebookID option[value=" + parseInt(response.data[i].NotebookID) + "]").attr("selected", "selected");
+                        })
+                    }
+                    else {
+                        $(".view-note").append("<h2>Nhật ký không tồn tại</h2><p></p>");
+                    }
+                }
+            })
+            return false;
+        });
+
+        $(document).ready(function () {
+            $("#update-note").on("click", function (e) {
+                e.preventDefault();
+                $(wrapper).find(".animate-alert").remove();
+                var inputTitle = $("#inputTitle").val();
+                var inputNoteBook = $("#notebookID").find('option:selected').val();
+                var inputBody = CKEDITOR.instances['inputBody'].getData();
+                for (var instanceName in CKEDITOR.instances) {
+                    CKEDITOR.instances[instanceName].updateElement();
+                }
+                if (inputBody.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputBody", "Nội dung không được để trống")
+                    return false;
+                }
+                else if (inputNoteBook == 0) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#notebookID", "Sổ tay chưa được chọn");
+                    return false;
+                }
+                else {
+                    console.log(inputNoteBook)
+                    var encode_inputBody = escape(inputBody);
+                    $(wrapper).find(".animate-alert").remove();
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Client/Note/UpdateNote",
+                        data: { "noteID": noteID, "body": encode_inputBody, "notebookID": inputNoteBook, "title": inputTitle },
+                        success: function (response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Cập nhật thành công",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Client/Note/ViewNote/" + noteID
+                                })
+                            }
+                            else if (response.status == 2) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Nhật ký không tồn tại",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    })
+                    return false;
+                }
+            })
+        });
+
+        $(document).ready(function () {
+            $("#delete-note").on("click", function () {
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Client/Note/DeleteNote",
+                    data: { "noteID": noteID },
+                    success: function (response) {
+                        if (response.status == 1) {
+                            Swal.fire({
+                                position: "center",
+                                type: "success",
+                                title: "Đã được chuyển vào thùng rác",
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(function () {
+                                window.location.href = "/Client/Home"
+                            })
+                        }
+                        else if (response.status == 2) {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            position: "center",
+                            type: "error",
+                            title: "Có lỗi, vui lòng thử lại...",
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                })
+                return false;
+            })
+        })
+
+        CKEDITOR.replace('inputBody', {
+            language: 'en',
+            height: 100,
+            toolbarCanCollapse: true
+        });
+    </script>
+}

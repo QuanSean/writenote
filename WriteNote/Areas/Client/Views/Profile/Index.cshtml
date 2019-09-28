@@ -1,0 +1,305 @@
+﻿@{
+    ViewBag.Title = "Thông tin cá nhân";
+    ViewBag.Profile = "active";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+}
+<div class="section light-bg">
+    <div class="container">
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#info">Thông tin</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#password">Đổi mật khẩu</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#fullname">Đổi tên</a>
+            </li>
+            @{
+                if (int.Parse(Session["SubscriptionID"].ToString()) == 2 || int.Parse(Session["SubscriptionID"].ToString()) == 3)
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#statistic">Thống kê</a>
+                    </li>
+                }
+            }
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="info">
+                <div class="d-flex flex-column">
+                    <div class="view-profile">
+                        <div class="md-form mt-3">
+                            <input type="text" id="displayUsername" name="displayUsername" class="form-control" autofocus disabled>
+                            <label for="displayUsername">Tên người dùng</label>
+                        </div>
+                        <div class="md-form mt-3">
+                            <input type="text" id="displayPassword" name="displayPassword" class="form-control" autofocus disabled>
+                            <label for="displayPassword">Mật khẩu</label>
+                        </div>
+                        <div class="md-form mt-3">
+                            <input type="text" id="displayEmail" name="displayEmail" class="form-control" autofocus disabled>
+                            <label for="displayEmail">Email</label>
+                        </div>
+                        <div class="md-form mt-3">
+                            <input type="text" id="displayFullname" name="displayFullname" class="form-control" autofocus disabled>
+                            <label for="displayFullname">Tên đầy đủ</label>
+                        </div>
+                        <div class="md-form mt-3">
+                            <input type="text" id="displayDatetimeCreate" name="displayDatetimeCreate" class="form-control" autofocus disabled>
+                            <label for="displayDatetimeCreate">Ngày đăng ký</label>
+                        </div>
+                        <div class="md-form mt-3">
+                            <input type="text" id="displaySubscription" name="displaySubscription" class="form-control" autofocus disabled>
+                            <label for="displaySubscription">Gói đang dùng</label>
+                        </div>
+                        <div class="md-form mt-3">
+                            <input type="text" id="displayRole" name="displayRole" class="form-control" autofocus disabled>
+                            <label for="displayRole">Loại tài khoản</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="password">
+                <div class="d-flex flex-column">
+                    <div class="edit-note">
+                        <div class="md-form mt-3">
+                            <input type="password" id="inputOldPassword" name="inputOldPassword" class="form-control">
+                            <label for="inputOldPassword">Mật khẩu cũ</label>
+                        </div>
+                        <div class="md-form mt-3">
+                            <input type="password" id="inputNewPassword" name="inputNewPassword" class="form-control">
+                            <label for="inputNewPassword">Mật khẩu mới</label>
+                        </div>
+                        <div class="md-form mt-3">
+                            <input type="password" id="inputRePassword" name="inputRePassword" class="form-control">
+                            <label for="inputRePassword">Nhập lại mật khẩu</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-lg-row">
+                    <button class="btn btn-primary" id="update-password">Cập nhật</button>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="fullname">
+                <div class="d-flex flex-column">
+                    <div class="edit-note">
+                        <div class="md-form mt-3">
+                            <input type="text" id="inputUsername" name="inputUsername" class="form-control" autofocus>
+                            <label for="inputUsername">Tên người dùng</label>
+                        </div>
+                        <div class="md-form mt-3">
+                            <input type="text" id="inputFullname" name="inputFullname" class="form-control" autofocus>
+                            <label for="inputFullname">Tên đầy đủ</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-lg-row">
+                    <button class="btn btn-primary" id="update-fullname">Cập nhật</button>
+                </div>
+            </div>
+            @{
+                if (int.Parse(Session["SubscriptionID"].ToString()) == 2 || int.Parse(Session["SubscriptionID"].ToString()) == 3)
+                {
+                    <div class="tab-pane fade" id="statistic">
+                        <div class="d-flex flex-column flex-lg-row">
+                            <a class="btn btn-primary" href="@Url.Action("Index", "Statistic", new { area = "Client" })">Xem thống kê</a>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script>
+        "use strict";
+        var errorMessage = function (element, text) {
+            let wrapper = $(".edit-note " + element);
+            $(wrapper).find(".animate-alert").remove();
+            if (!$(wrapper).find(".animate-alert").length) {
+                $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">" + text + "</div>"));
+            }
+            else {
+                $(wrapper).find(".animate-alert").remove();
+            }
+        }
+
+        $(document).ready(function () {
+            let wrapper = $("#info .view-profile");
+            let wrapper_two = $("#fullname .edit-note");
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Client/Profile/Index",
+                data: { "flag": true },
+                success: function (response) {
+                    if (response.status) {
+                        $.each(response.data, function (i) {
+
+                            var milli = response.data[i].DatetimeCreate.replace(/\/Date\((-?\d+)\)\//, '$1');
+                            var d = new Date(parseInt(milli));
+
+                            $(wrapper).find("input[id='displayUsername']").val(response.data[i].Username)
+                            $(wrapper).find("input[id='displayPassword']").val(response.data[i].Password)
+                            $(wrapper).find("input[id='displayEmail']").val(response.data[i].Email)
+                            $(wrapper).find("input[id='displayFullname']").val(response.data[i].Fullname)
+                            $(wrapper).find("input[id='displayDatetimeCreate']").val(d)
+                            $(wrapper).find("input[id='displaySubscription']").val(response.data[i].SubscriptionName)
+                            $(wrapper).find("input[id='displayRole']").val(response.data[i].RoleName)
+
+                            $(wrapper_two).find("input[id='inputUsername']").val(response.data[i].Username)
+                            $(wrapper_two).find("input[id='inputFullname']").val(response.data[i].Fullname)
+                        })
+                    }
+                    else {
+                        $(wrapper).append("<h2>Người dùng không tồn tại</h2>")
+                    }
+                }
+            })
+            return false;
+        })
+
+        $(document).ready(function () {
+            let wrapper = $("#password");
+            $("button#update-password").on("click", function (e) {
+                e.preventDefault();
+                $(wrapper).find(".animate-alert").remove();
+
+                var inputOldPassword = $("#inputOldPassword").val();
+                var inputNewPassword = $("#inputNewPassword").val();
+                var inputRePassword = $("#inputRePassword").val();
+
+                if (inputOldPassword.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("input[id='inputOldPassword']", "Mật khẩu cũ không được để trống");
+                    return false;
+                }
+                else if (inputNewPassword.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("input[id='inputNewPassword']", "Mật khẩu mới không được để trống");
+                    return false;
+                }
+                else if (inputNewPassword.length < 6) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("input[id='inputNewPassword']", "Mật khẩu mới không được nhỏ hơn 6 ký tự");
+                    return false;
+                }
+                else if (inputRePassword.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("input[id='inputRePassword']", "Xác nhận mật khẩu không được để trống");
+                    return false;
+                }
+                else if (inputNewPassword !== inputRePassword) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("input[id='inputRePassword']", "Mật khẩu mới không khớp");
+                    return false;
+                }
+                else {
+                    $(wrapper).find(".animate-alert").remove();
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Client/Profile/ChangePassword",
+                        data: { "oldpassword": inputOldPassword, "newpassword": inputNewPassword },
+                        success: function (response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Đổi mật khẩu thành công",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Account/Logout"
+                                })
+                            }
+                            else {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Mật khẩu cũ không chính xác",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    })
+                    return false;
+                }
+            })
+        })
+
+        $(document).ready(function () {
+            let wrapper = $("#fullname");
+            $("button#update-fullname").on("click", function (e) {
+                e.preventDefault();
+                $(wrapper).find(".animate-alert").remove();
+
+                var inputUsername = $("#fullname #inputUsername").val();
+                var inputFullname = $("#fullname #inputFullname").val();
+
+                if (inputUsername.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("input[id='inputUsername']", "Tên người dùng không được để trống");
+                    return false;
+                }
+                else if (inputFullname.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("input[id='inputFullname']", "Tên đầy đủ không được để trống");
+                    return false;
+                }
+                else {
+                    $(wrapper).find(".animate-alert").remove();
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Client/Profile/ChangeFullname",
+                        data: { "username": inputUsername, "fullname": inputFullname },
+                        success: function (response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Cập nhật thành công",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Client/Profile"
+                                })
+                            }
+                            else {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Có lỗi, vui lòng thử lại...",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    })
+                    return false;
+                }
+            })
+        })
+    </script>
+}

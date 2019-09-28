@@ -1,0 +1,125 @@
+﻿@{
+    ViewBag.Title = "Trang quản trị";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<section class="welcome p-t-50">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1 class="title-4">
+                    Chào mừng trở lại
+                    <span>@ViewData["Fullname"]!</span>
+                </h1>
+                <hr class="line-seprate">
+            </div>
+        </div>
+    </div>
+</section>
+<section class="statistic statistic2">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 col-lg-3">
+                <div class="statistic__item statistic__item--green">
+                    <h2 class="number">@ViewData["CountUser"]</h2>
+                    <span class="desc">Thành viên</span>
+                    <div class="icon">
+                        <i class="zmdi zmdi-account-o"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="statistic__item statistic__item--orange">
+                    <h2 class="number">@ViewData["CountNote"]</h2>
+                    <span class="desc">Nhật ký</span>
+                    <div class="icon">
+                        <i class="zmdi zmdi-shopping-cart"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="statistic__item statistic__item--blue">
+                    <h2 class="number">@ViewData["CountNotebook"]</h2>
+                    <span class="desc">Sổ tay</span>
+                    <div class="icon">
+                        <i class="zmdi zmdi-calendar-note"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="statistic__item statistic__item--red">
+                    <h2 class="number">@ViewData["CountSubscription"]</h2>
+                    <span class="desc">Giao dịch</span>
+                    <div class="icon">
+                        <i class="zmdi zmdi-money"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="statistic-chart">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h3 class="title-5 m-b-35">Hoạt động</h3>
+            </div>
+        </div>
+        <div class="row m-t-15">
+            <div class="col-md-12">
+                <div class="table-responsive m-b-40">
+                    <table class="table table-borderless table-data3" id="logs">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Note</th>
+                                <th>Notebook</th>
+                                <th>Datetime Create</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts
+{
+    <script>
+        "use strict";
+        var wrapper = $("#logs>tbody");
+        $(document).ready(function () {
+            let allElement;
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Home/GetLog",
+                data: { "flag": true },
+                success: function (response) {
+                    allElement = "";
+                    if (response.status == true) {
+                        $.each(response.data, function (i) {
+                            let milli = response.data[i].DatetimeCreate.replace(/\/Date\((-?\d+)\)\//, '$1');
+                            let d = new Date(parseInt(milli));
+                            let element1 = "<tr>";
+                            let element2 = "<td>" + response.data[i].Email + "</td>";
+                            let element3 = "<td>" + response.data[i].NoteTitle + "</td>";
+                            let element4 = "<td>" + response.data[i].NotebookTitle + "</td>";
+                            let element5 = "<td>" + d + "</td>";
+                            let element6 = "</tr>";
+                            allElement += element1 + element2 + element3 + element4 + element5 + element6;
+                        });
+                        $(wrapper).html(allElement);
+                    }
+                    else {
+                        $(wrapper).append("<tr><td>Không có log</td></tr>");
+                    }
+                }
+            });
+            return false;
+        });
+    </script>
+}

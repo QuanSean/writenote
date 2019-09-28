@@ -1,0 +1,199 @@
+﻿
+@{
+    ViewBag.Title = "Danh sách nhật ký";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<section class="container p-t-50">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- DATA TABLE -->
+            <h3 class="title-5 m-b-35">DANH SÁCH NHẬT KÝ</h3>
+            <div class="table-data__tool">
+                <div class="table-data__tool-left">
+                    <div class="rs-select2--light rs-select2--md">
+                        <select class="js-select2" name="User" id="User">
+                            <option value="0" selected="selected">All User</option>
+                        </select>
+                        <div class="dropDownSelect2"></div>
+                    </div>
+                </div>
+                <div class="table-data__tool-right">
+                    <a href="@Url.Action("CreateNote", "Note", new { area = "Admin" })" class="au-btn au-btn-icon au-btn--green au-btn--small">
+                        <i class="zmdi zmdi-plus"></i>Thêm nhật ký
+                    </a>
+                </div>
+            </div>
+            <div class="table-responsive table-responsive-data2" id="list-note">
+                <table class="table table-data2">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Body</th>
+                            <th>Notebook</th>
+                            <th>DateTime Create</th>
+                            <th>DateTime Update</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="staticModalLabel" aria-hidden="true"
+     data-backdrop="static">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticModalLabel">Cảnh báo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xoá nhật ký này.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Huỷ</button>
+                <button type="button" class="btn btn-danger" id="confirm">Xoá</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script>
+        "use strict";
+        var wrapper = $("#list-note>table>tbody");
+
+        $(document).ready(function () {
+            let allElement;
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Note/ListUser",
+                data: { "flag": true },
+                success: function (response) {
+                    if (response.status == true) {
+                        $.each(response.dataus, function (i) {
+                            $("select#User").append(new Option(response.dataus[i].Email, response.dataus[i].UserID));
+                        })
+                        allElement = "";
+                            $.each(response.datant, function (i) {
+                                var datetimeCreate = new Date(parseInt(response.datant[i].DatetimeCreate.replace(/\/Date\((-?\d+)\)\//, '$1')));
+                                var datetimeUpdate = new Date(parseInt(response.datant[i].DatetimeUpdate.replace(/\/Date\((-?\d+)\)\//, '$1')));
+                                let element1 = "<tr class=\"tr-shadow\">";
+                                let element2 = "<td>" + response.datant[i].Title + "</td>";
+                                let element3 = "<td><span class=\"block-email\">" + unescape(response.datant[i].Body) + "</span></td>";
+                                let element4 = "<td class=\"desc\">" + response.datant[i].NotebookName + "</td>";
+                                let element5 = "<td>" + datetimeCreate + "</td>";
+                                let element6 = "<td>" + datetimeUpdate + "</td>";
+                                let buttonElement = "<td><div class=\"table-data-feature\">";
+                                var url = '@Url.Action("EditNote", "Note", new { area = "Admin", id = "_id_" })'.replace('_id_', response.datant[i].NoteID);
+                                let editElement = "<a class=\"item\" href=" + url + "><i class=\"zmdi zmdi-edit\"></i></a>";
+                                let deleteElement = "<button class=\"item delete\" data-toggle=\"modal\" data-target=\"#deleteModal\" data-id=" + response.datant[i].NoteID + "><i class=\"zmdi zmdi-delete\"></i></button>";
+                                let endButtonElement = "</div></td>";
+                                let breakElement = "<tr class=\"spacer\"></tr>";
+                                allElement += element1 + element2 + element3 + element4 + element5 + element6 + buttonElement + editElement + deleteElement + endButtonElement + breakElement;
+                            })
+                        $(wrapper).html(allElement);
+                    }
+                    else {
+                        $(wrapper).html("<tr class=\"tr-shadow\"><td>Không có nhật ký</td></tr>");
+                    }
+                }
+            })
+            return false;
+        });
+
+        $(document).ready(function () {
+            $("select").on("change", function () {
+                let UserID = $("select#User").find('option:selected').val();
+                let allElement;
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Admin/Note/Index",
+                    data: { "flag": true, "UserID": UserID },
+                    success: function (response) {
+                        if (response.status == true) {
+                            allElement = "";
+                            $.each(response.data, function (i) {
+                                var datetimeCreate = new Date(parseInt(response.data[i].DatetimeCreate.replace(/\/Date\((-?\d+)\)\//, '$1')));
+                                var datetimeUpdate = new Date(parseInt(response.data[i].DatetimeUpdate.replace(/\/Date\((-?\d+)\)\//, '$1')));
+                                let element1 = "<tr class=\"tr-shadow\">";
+                                let element2 = "<td>" + response.data[i].Title + "</td>";
+                                let element3 = "<td><span class=\"block-email\">" + unescape(response.data[i].Body) + "</span></td>";
+                                let element4 = "<td class=\"desc\">" + response.data[i].NotebookName + "</td>";
+                                let element5 = "<td>" + datetimeCreate + "</td>";
+                                let element6 = "<td>" + datetimeUpdate + "</td>";
+                                let buttonElement = "<td><div class=\"table-data-feature\">";
+                                var url = '@Url.Action("EditNote", "Note", new { area = "Admin", id = "_id_" })'.replace('_id_', response.data[i].NoteID);
+                                let editElement = "<a class=\"item\" href=" + url + "><i class=\"zmdi zmdi-edit\"></i></a>";
+                                let deleteElement = "<button class=\"item delete\" data-toggle=\"modal\" data-target=\"#deleteModal\" data-id=" + response.data[i].NoteID + "><i class=\"zmdi zmdi-delete\"></i></button>";
+                                let endButtonElement = "</div></td>";
+                                let breakElement = "<tr class=\"spacer\"></tr>";
+                                allElement += element1 + element2 + element3 + element4 + element5 + element6 + buttonElement + editElement + deleteElement + endButtonElement + breakElement;
+                            })
+                            $(wrapper).html(allElement);
+                        }
+                        else {
+                            $(wrapper).html("<tr class=\"tr-shadow\"><td>Không có nhật ký</td></tr>");
+                        }
+                    }
+                })
+                return false;
+            })
+        });
+
+        var NoteID = "";
+
+        $(document).on('click', '.delete', function (e) {
+            e.preventDefault();
+            NoteID = $(this).attr("data-id");
+        })
+
+        $(document).on("click", ".modal #confirm", function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Admin/Note/DeleteNote",
+                data: { "NoteID":  NoteID },
+                success: function (response) {
+                    if (response.status) {
+                        Swal.fire({
+                            position: "center",
+                            type: "success",
+                            title: "Xoá nhật ký thành công",
+                            showConfirmButton: false,
+                            timer: 1000
+                        }).then(function () {
+                            window.location.href = "/Admin/Note"
+                        })
+                    }
+                    else {
+                        Swal.fire({
+                            position: "center",
+                            type: "error",
+                            title: "Nhật ký này không tồn tại",
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                },
+                error: function (e) {
+                    Swal.fire({
+                        position: "center",
+                        type: "error",
+                        title: "Có lỗi, vui lòng thử lại...",
+                        showConfirmButton: false,
+                        timer: 1000
+                    })
+                }
+            })
+            return false;
+        })
+    </script>
+}

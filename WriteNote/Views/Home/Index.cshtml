@@ -1,0 +1,183 @@
+﻿@{ 
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@* MENU ONE  *@
+<div class="pattern-background green clearfix" id="menu-one">
+    <div class="row">
+        <div class="content-container clearfix">
+            <div class="content">
+                <h1>Tổ chức ngăn nắp mà không mất nhiều công sức</h1>
+                <div class="description">Writenote giúp bạn thu thập và sắp xếp ý tưởng, dự án và danh sách việc cần làm, để bạn không bỏ sót việc gì.</div>
+                @Html.ActionLink("ĐĂNG KÝ MIỄN PHÍ", "Register", "Account", new { area = "" }, htmlAttributes: new { @class = "button-primary white" })
+            </div>
+            <div class="image">
+                <img class="desktop-only image" src="@Url.Content("~/Content/img/homepage-hero-desktop.png")">
+            </div>
+        </div>
+    </div>
+</div>
+
+@* MENU TWO  *@
+
+<div class="info-card-component colored-background grey">
+    <div class="menu-two card-row card-list clearfix">
+        <div class="heading-content">
+            <img src="@Url.Content("~/Content/img/homepage-focus.png")">
+            <h2>Tập trung vào những gì quan trọng nhất</h2>
+        </div>
+        <div class="cards clearfix">
+            <div class="row">
+                <div class="col">
+                    <div class="text-note text-only">
+                        <div class="info">
+                            <div class="content">Quản lý mọi thứ, từ dự án lớn để khoảnh khắc cá nhân.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-note text-only">
+                        <div class="info">
+                            <div class="content">Nắm bắt ý tưởng và cảm ứng vào trong ghi chú, âm thanh và hình ảnh.</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="text-note text-only">
+                        <div class="info">
+                            <div class="content">Kịp thời theo dõi các dự án và thời hạn.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* MENU THREE  *@
+
+<div class="info-card-component">
+    <div class="menu-three solutions card-list clearfix">
+        <div class="heading-content">
+            <img src="@Url.Content("~/Content/img/homepage-mask.png")">
+            <h2>Ở cơ quan, ở nhà và khắp mọi nơi</h2>
+            <div class="details">Các gói thuê bao và mức giá của WriteNote được thiết kế theo nhu cầu của bạn.</div>
+        </div>
+        <div class="cards clearfix">
+            <div class="row">
+                <div class="col info">
+                    <div class="heading">Ghi nhớ mọi thứ quan trọng</div>
+                    <div class="content">Một nơi tập trung cho các ghi chú, ý tưởng, danh sách và lời nhắc của bạn.</div>
+                    <div class="buttons">
+                        <div class="cta">
+                            <a class="button solution" href="/">
+                                WRITENOTE BASIC →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 image">
+                    <img src="@Url.Content("~/Content/img/homepage-remember-everything.png")" alt="Hình minh họa khái niệm ghi nhớ mọi thứ: bộ não con người trang trí theo nhiều phần có màu sắc và họa tiết khác nhau" class="">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col image">
+                    <img src="@Url.Content("~/Content/img/multi-devices.png")" alt="hình ghép gồm một màn hình máy tính, ghi chú, bao quanh là mũi tên, dấu kiểm và ngôi sao">
+                </div>
+                <div class="col info">
+                    <div class="heading">Tổ chức ngăn nắp, mọi lúc mọi nơi</div>
+                    <div class="content">Lên kế hoạch, lưu hồ sơ và quản lý dự án trên mọi thiết bị–ngay cả khi ngoại tuyến.</div>
+                    <div class="buttons">
+                        <div class="cta">
+                            <a class="button solution" href="/">
+                                WRITENOTE PREMIUM →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col info">
+                    <div class="heading">Cộng tác với nhóm</div>
+                    <div class="content">Quản lý dự án, thời hạn, khách hàng và cuộc họp một cách dễ dàng.</div>
+                    <div class="buttons">
+                        <div class="cta">
+                            <a class="button solution" href="/">
+                                WRITENOTE BUSINESS →
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col image">
+                    <img src="@Url.Content("~/Content/img/empty_space.svg")" alt="ba hình đầu người chứa ba khối hộp, liên kết với nhau">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="writenote-button">
+                        <div class="list-cta-buttons">
+                            @Html.ActionLink("VIẾT NOTE ĐẦU TIÊN", "Login", "Account", new { area = "" }, htmlAttributes: new { @class = "button-primary writenote" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* MENU FOUR *@
+
+<div class="info-card-component colored-background grey">
+    <div class="card-row four card-list clearfix">
+        <div class="heading-content">
+            <h2 class="heading">Cách hoạt động</h2>
+        </div>
+        <div class="cards clearfix">
+            <div class="row">
+                <div class="col">
+                    <div class="image">
+                        <img src="https://evernote.com/c/assets/homepage/sign-up.png?4707bc674944bfd0">
+                    </div>
+                    <div class="info">
+                        <div class="heading">ĐĂNG KÝ</div>
+                        <div class="content">Tạo tài khoản miễn phí và chọn gói thuê bao phù hợp với nhu cầu của bạn.</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="image">
+                        <img src="@Url.Content("~/Content/img/add-content.png")">
+                    </div>
+                    <div class="info">
+                        <div class="heading">THÊM NỘI DUNG</div>
+                        <div class="content">Nhập ghi chú, thêm tệp đính kèm, trích trang web hoặc ghi âm một biên bản. Tất cả ở cùng một nơi.</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="image">
+                        <img src="@Url.Content("~/Content/img/find-everything.png")">
+                    </div>
+                    <div class="info">
+                        <div class="heading">TÌM THẤY MỌI THỨ</div>
+                        <div class="content">Tổ chức theo cách bạn muốn. Dùng sổ tay, thẻ hoặc tính năng tìm kiếm mạnh mẽ của chúng tôi để tìm thấy mọi thứ bạn cần một cách nhanh chóng.</div>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="image">
+                        <img src="@Url.Content("~/Content/img/get-things-done.png")">
+                    </div>
+                    <div class="info">
+                        <div class="heading">HOÀN THÀNH CÔNG VIỆC</div>
+                        <div class="content">Quản lý dự án, ghi chú cho cuộc họp, đặt lời nhắc và chỉnh sửa tài liệu.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="button-free">
+                <div class="list-cta-buttons">
+                    @Html.ActionLink("BẮT ĐẦU DÙNG THỬ MIỄN PHÍ", "Login", "Account", new { area = "" }, htmlAttributes: new { @class= "button-primary writenote" })
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

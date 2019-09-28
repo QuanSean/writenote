@@ -1,0 +1,151 @@
+﻿
+@{
+    ViewBag.Title = "Thanh toán";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+}
+
+@{ 
+    var subscriptionID = Session["BuySubscriptionID"].ToString();
+    var price = Session["BuySubscriptionPrice"].ToString();
+    var count = Session["BuySubscriptionCount"].ToString();
+}
+
+<div class="section light-bg">
+    <div class="container">
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#infoPay">THANH TOÁN</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="infoPay">
+                <div class="d-flex flex-column">
+                    <div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail">Email</label>
+                                <input type="email" class="form-control" id="inputEmail" placeholder="Email" disabled>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputFullname">Tên đầy đủ</label>
+                                <input type="text" class="form-control" id="inputFullname" placeholder="Fullname" disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputSubscription">GÓI ĐĂNG KÝ</label>
+                                <input type="text" class="form-control" id="inputSubscription" disabled>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputPrice">GIÁ</label>
+                                <input type="text" class="form-control" id="inputPrice" disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputCount">Số tháng</label>
+                                <input type="number" class="form-control" id="inputCount" disabled>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputTotal">Thành giá</label>
+                                <input type="text" class="form-control" id="inputTotal" disabled>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="pay">Thanh toán</button>
+                        <button type="submit" class="btn btn-info" id="cancel">Huỷ</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script> 
+        "use strict";
+        var subscriptionID = '@subscriptionID';
+        var price = '@price';
+        var count = '@count';
+
+        $(document).ready(function () {
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                data: { "flag": true },
+                url: "/Client/Shop/Cart",
+                success: function (response) {
+                    if (response.status) {
+                        $("#infoPay").find("input[id='inputEmail']").val(response.dataUser.Email);
+                        $("#infoPay").find("input[id='inputFullname']").val(response.dataUser.Fullname);
+                        $("#infoPay").find("input[id='inputSubscription']").val(response.dataCart.SubscriptionName);
+                        $("#infoPay").find("input[id='inputPrice']").val(price);
+                        $("#infoPay").find("input[id='inputCount']").val(count);
+                        let total = price * count
+                        $("#infoPay").find("input[id='inputTotal']").val(total);
+                    }
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $("#cancel").on("click", function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    data: { "flag": true },
+                    url: "/Client/Shop/Cancel",
+                    success: function (response) {
+                        if (response.status) {
+                            Swal.fire({
+                                position: "center",
+                                type: "success",
+                                title: "Xoá giỏ hàng thành công",
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(function () {
+                                window.location.href = "/Client/Shop"
+                            })
+                        }
+                    }
+                });
+                return false;
+            });
+
+            $("#pay").on("click", function (e) {
+                e.preventDefault();
+                var total = $("#infoPay").find("input[id='inputTotal']").val();
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    data: { "total": total },
+                    url: "/Client/Shop/Pay",
+                    success: function (response) {
+                        if (response.status) {
+                            Swal.fire({
+                                position: "center",
+                                type: "success",
+                                title: "Mua thành công",
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(function () {
+                                window.location.href = "/Client/Profile"
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    }
+                });
+                return false;
+            });
+        });
+    </script>
+}

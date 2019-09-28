@@ -1,0 +1,159 @@
+﻿
+@{
+    ViewBag.Title = "Những nhật ký đã xoá";
+    ViewBag.NoteDelete = "active";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+}
+
+<div class="section light-bg" id="notes">
+    <div class="container">
+        <div class="section-title">
+            <br />
+            <h3>Nhật ký đã xoá</h3>
+        </div>
+        <div class="row"></div>
+    </div>
+</div>
+
+<div class="modal fade bottom" id="view-delete-note" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-full-height modal-bottom" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title w-50" id="myModalLabel">Khôi phục hay xoá hoàn toàn một nhật ký</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="md-form mt-3">
+                    <input type="text" id="inputTitle" name="inputTitle" class="form-control" disabled autofocus>
+                    <label for="inputTitle">Tiêu đề</label>
+                    <input type="text" id="noteID" name="noteID" hidden/>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" id="delete-note">Xoá hoàn toàn</button>
+                <button type="button" class="btn btn-primary" id="revive-note">Khôi phục</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        "use strict";
+        var wrapper = $(".modal-body");
+        $(document).ready(function () {
+            let wrapper = $("#notes>.container>.row");
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Client/NoteDelete",
+                data: { "flag": true },
+                success: function (response) {
+                    if (response.status == true) {
+                        $.each(response.data, function (i) {
+                            $(wrapper).append("<div class=\"col-12 col-lg-4\"><div class=\"card features\" data-toggle=\"modal\" data-target=\"#view-delete-note\"><div class=\"card-body\"><div class=\"media\"><div class=\"media-body\"><h4 class=\"card-title\">" + response.data[i].Title + "</h4></div></div></div></div></div>")
+                            $(".modal").find("input[id='inputTitle']").val(response.data[i].Title)
+                            $(".modal").find("input[id='noteID']").val(response.data[i].NoteID)
+                        })
+                    }
+                    else {
+                        $(wrapper).append("<div class=\"col-12 col-lg-4\"><div class=\"card features\"><div class=\"card-body\"><div class=\"media\"><div class=\"media-body\"><h4 class=\"card-title\">Thùng rác rỗng...</h4></div></div></div></div></div>")
+                    }
+                }
+            });
+            return false;
+        })
+
+        $(document).ready(function () {
+            $("button#delete-note").on("click", function (e) {
+                e.preventDefault();
+                var noteID = parseInt($(".modal").find("input[id='noteID']").val());
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Client/NoteDelete/Delete",
+                    data: { "noteID": noteID },
+                    success: function (response) {
+                        if (response.status) {
+                            Swal.fire({
+                                position: "center",
+                                type: "success",
+                                title: "Xoá thành công",
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(function () {
+                                window.location.href = "/Client/NoteDelete"
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            position: "center",
+                            type: "error",
+                            title: "Có lỗi, vui lòng thử lại...",
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                })
+                return false;
+            });
+
+            $("button#revive-note").on("click", function (e) {
+                e.preventDefault();
+                var noteID = parseInt($(".modal").find("input[id='noteID']").val());
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Client/NoteDelete/Revive",
+                    data: { "noteID": noteID },
+                    success: function (response) {
+                        if (response.status) {
+                            Swal.fire({
+                                position: "center",
+                                type: "success",
+                                title: "Khôi phục thành công",
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(function () {
+                                window.location.href = "/Client/Home"
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            position: "center",
+                            type: "error",
+                            title: "Có lỗi, vui lòng thử lại...",
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                })
+                return false;
+            });
+        })
+    </script>
+}

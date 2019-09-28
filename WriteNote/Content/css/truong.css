@@ -1,0 +1,162 @@
+﻿@charset "UTF-8";
+@import url(https://fonts.googleapis.com/css?family=Quicksand:400,700);
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box !important;
+}
+
+html {
+    position: relative;
+    min-height: 100%;
+    min-width: 100%;
+    font-size: 16px;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Quicksand', sans-serif;
+    line-height: 22px;
+    padding: 50px 0;
+    background: url(/Content/img/wellcome-back-gr.png) center;
+    background-size: 228px 228px;
+}
+
+a, a:hover {
+    text-decoration: none;
+}
+
+.signin-content {
+    margin: 0 300px;
+    background-color: #fff;
+    padding: 62.12px 99px 48px;
+    box-shadow: 0px 4px 24px rgba(0, 0, 0, 0.1);
+    -webkit-border-radius: 2px;
+    -moz-border-radius: 2px;
+}
+
+.signin-content .header {
+    display: block;
+}
+
+.signin-content .header .logo {
+    margin-bottom: 20px;
+}
+
+.signin-content .header .logo img {
+    height: 100%;
+    width: 100%;
+}
+
+.signin-content .form-signin {
+    text-align: left;
+}
+
+.signin-content .signup {
+    font-weight: 400;
+    text-align: center;
+    margin-top: 34px;
+    font-style: normal;
+}
+
+.signin-content .context-switch-signup {
+    font-weight: 500;
+    font-size: .9rem;
+    color: #737373;
+}
+
+.signin-content .form-signin {
+    width: 100%;
+    max-width: 420px;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.signin-content .signup-context a {
+    color: #3498db;
+}
+
+.signin-content .signup-context a:hover {
+    color: #2c3e50;
+    transition: color .1s ease-in-out;
+}
+
+.rules {
+    font-weight: 500;
+    font-size: .8rem;
+    color: #535c68;
+}
+
+.rules .dieukhoan,
+.rules .chinhsach {
+    color: #ff3f34;
+}
+
+.signup-google {
+    padding: 15px;
+}
+
+.oauth-google {
+    height: 40px;
+    border-radius: 7px;
+    border: solid 1px #d0d0d0;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    background-color: #ffffff;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    flex-basis: auto;
+}
+
+.oauth-google .oauth-google-inner {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.oauth-google .oauth-google-text {
+    max-width: 280px;
+    font-size: 15px;
+    color: #6a6a6a;
+    display: inline-block;
+    position: relative;
+    padding-left: 6px;
+}
+
+.horizontalRow {
+    position: relative;
+    margin-bottom: 18px;
+    margin-top: 17px;
+}
+
+.horizontalText {
+    width: 100%;
+    text-align: center;
+    background-color: #ffffff;
+    position: relative;
+    color: #ababab;
+    font-size: 14px;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.forgot-password {
+    display: block;
+}
+
+.forgot-password a {
+    color: #c0392b;
+}
+
+.forgot-password a:hover {
+    color: #34495e;
+    transition: color .2s ease-in-out;
+}

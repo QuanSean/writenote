@@ -1,0 +1,196 @@
+﻿@{
+    ViewBag.Title = "Tất cả nhật ký";
+    ViewBag.Home = "active";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+}
+<div class="section light-bg" id="notes">
+    <div class="container">
+        <div class="section-title">
+            <br />
+            <h3>Tất cả nhật ký</h3>
+            <br />
+            <center><div class="circle-icon mr-4" data-toggle="modal" data-target="#create-note">&plus;</div></center>
+        </div>
+        <div class="masonry">
+        </div>
+    </div>
+</div>
+<div class="modal fade bottom" id="create-note" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-full-height modal-bottom" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title w-50" id="myModalLabel">Tạo mới một nhật ký</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="md-form mt-3">
+                    <input type="text" id="inputTitle" name="inputTitle" class="form-control">
+                    <label for="inputTitle">Tiêu đề</label>
+                </div>
+                <select class="browser-default custom-select" id="notebookID" name="notebookID">
+                    <option value="0" selected>Chọn một sổ tay</option>
+                    @foreach (var i in ViewData["listNoteBook"] as IEnumerable<WriteNote.Models.NoteBook>)
+                    {
+                        <option value="@i.NotebookID">@i.Title</option>
+                    }
+                </select>
+                <hr />
+                <textarea id="inputBody" name="inputBody"></textarea>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Không lưu</button>
+                <button type="button" class="btn btn-primary" id="create">Lưu lại</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script src="//cdn.ckeditor.com/4.11.3/standard/ckeditor.js"></script>
+    <script>
+        "use strict";
+        var wrapper = $(".modal-body");
+
+        var errMessTwo = function (input_type, alert) {
+            let wrapper = $(".modal-body>" + input_type + "");
+            if (!$(wrapper).find(".animate-alert").length) {
+                $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">" + alert + "</div>"));
+            }
+            else {
+                $(wrapper).find(".animate-alert").remove();
+            }
+        }
+
+        $(document).ready(function () {
+            let wrapper = $("#notes>.container>.masonry");
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Client/Home/Index",
+                data: { "flag": true },
+                success: function (response) {
+                    if (response.status == true) {
+                        $.each(response.data, function (i) {
+                            var url = '@Url.Action("ViewNote", "Note", new { area = "Client", id = "_id_" })'.replace('_id_', response.data[i].NoteID);
+                            $(wrapper).append("<div class=\"brick\"><div class=\"card features\"><div class=\"card-body\"><div class=\"media\"><div class=\"media-body\"><a href=\"" + url + "\"><h4 class=\"card-title\">" + response.data[i].Title + "</h4></a><p class=\"card-text\">" + unescape(response.data[i].Body) + "</p></div></div></div></div></div>")
+                        })
+                    }
+                    else {
+                        $(wrapper).append("<div class=\"brick\"><div class=\"card features\"><div class=\"card-body\"><div class=\"media\"><div class=\"media-body\"><h4 class=\"card-title\">Chưa có nhật ký nào cả</h4><p class=\"card-text\">Thêm mới một nhật ký</p></div></div></div></div></div>")
+                    }
+                }
+            })
+            return false;
+        })
+
+        $("button#create").on("click", function (e) {
+            e.preventDefault();
+            for (var instanceName in CKEDITOR.instances) {
+                CKEDITOR.instances[instanceName].updateElement();
+            }
+
+            var inputTitle = $("#inputTitle").val();
+            var inputNoteBook = parseInt($("#notebookID").val());
+            var inputBody = CKEDITOR.instances['inputBody'].getData();
+
+            //if (inputTitle.length == false) {
+            //    $(wrapper).find(".animate-alert").remove();
+            //    errMessTwo(".md-form", "Tiêu đề không được để trống");
+            //    return false;
+            //}
+
+            if (inputNoteBook == 0) {
+                $(wrapper).find(".animate-alert").remove();
+                errMessTwo(".browser-default", "Bạn chưa chọn sổ tay");
+                return false;
+            }
+            else if (inputBody.length == false) {
+                $(wrapper).find(".animate-alert").remove();
+                errMessTwo("#inputBody", "Nội dung không được để trống");
+                return false;
+            }
+            else {
+                var encode_inputBody = escape(inputBody);
+                $(wrapper).find(".animate-alert").remove();
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Client/Note/Create",
+                    data: { "body": encode_inputBody, "title": inputTitle, "notebookID": inputNoteBook },
+                    success: function (response) {
+                        if (response.status) {
+                            Swal.fire({
+                                position: "center",
+                                type: "success",
+                                title: "Thêm thành công",
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(function () {
+                                window.location.href = "/Client/Home"
+                            })
+                        }
+                        else {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            position: "center",
+                            type: "error",
+                            title: "Có lỗi, vui lòng thử lại...",
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                })
+                return false;
+            }
+        });
+
+        CKEDITOR.replace('inputBody', {
+            language: 'en',
+            height: 100,
+            toolbarCanCollapse: true
+        });
+
+        //$(document).click('.card.features', function (e) {
+        //    e.preventDefault();
+        //    var noteID = parseInt($(".card-text").attr('id'));
+
+        //    window.location.href = "/Client/Note/ViewNote/" + noteID;
+        //})
+
+        //$(document).click('.card.features', function (e) {
+        //    e.preventDefault();
+        //    var noteID = parseInt($(".card-text").attr('id'));
+        //    $.ajax({
+        //        type: "POST",
+        //        dataType: "json",
+        //        url: "/Client/Note/ViewNote",
+        //        data: { "noteID": noteID },
+        //        success: function (response) {
+        //            if (response.data) {
+        //                $('#create-note').modal('show');
+        //                $(".modal-body input[type='text']").val(response.data.Title);
+        //            }
+        //            else {
+        //                alert("Không thành công");
+        //            }
+        //        },
+        //        error: function () {
+        //            alert("loi")
+        //        }
+        //    })
+        //    return false;
+        //});
+    </script>
+}

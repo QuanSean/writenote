@@ -1,0 +1,4 @@
+﻿@if (Session["RoleName"].ToString() == "Admin")
+{
+    <li class="nav-item"><a class="nav-link @ViewBag.Admin" href="@Url.Action("Index", "Home", new { area ="Admin"})">ADMIN</a></li>
+}

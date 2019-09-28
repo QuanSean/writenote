@@ -1,0 +1,56 @@
+﻿
+@{
+    ViewBag.Title = "Tìm kiếm nhật ký";
+    ViewBag.Search = "active";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+}
+<div class="section light-bg" id="notes">
+    <div class="container">
+        <div class="section-title">
+            <div class="form-row">
+                <div class="form-group col-md-12">
+                    <input type="text" class="form-control" id="inputValue" name="inputValue" placeholder="Từ khoá">
+                </div>
+            </div>
+        </div>
+        <div class="masonry"></div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        "use strict";
+        $(document).ready(function () {
+            $("#inputValue").on("keyup change", function (e) {
+                e.preventDefault();
+                var inputValue = $(this).val();
+                if (inputValue.length == false) {
+                    $(wrapper).find(".brick").remove();
+                }
+                else {
+                    var wrapper = $("#notes>.container>.masonry");
+                    $(wrapper).find(".brick").remove();
+                    $.ajax({
+                        url: "/Client/Search",
+                        data: { "value": inputValue },
+                        type: "POST",
+                        dataType: "json",
+                        success: function (response) {
+                            if (response.status) {
+                                $.each(response.data, function (i) {
+                                    var url = '@Url.Action("ViewNote", "Note", new { area = "Client", id = "_id_" })'.replace('_id_', response.data[i].NoteID);
+                                    $(wrapper).append("<div class=\"brick\"><div class=\"card features\"><div class=\"card-body\"><div class=\"media\"><div class=\"media-body\"><a href=\"" + url + "\"><h4 class=\"card-title\">" + response.data[i].Title + "</h4></a><p class=\"card-text\">" + unescape(response.data[i].Body) + "</p></div></div></div></div></div>")
+                                })
+                            }
+                            else {
+                                $(wrapper).find(".brick").remove();
+                            }
+                        }
+                    });
+                    return false;
+                }
+            });
+        });
+    </script>
+}

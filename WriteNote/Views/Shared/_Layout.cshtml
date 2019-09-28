@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Tổ chức ghi chú bằng Writenote</title>
+    <meta name="description" content="Writenote là ứng dụng giúp sắp xếp ghi chú của bạn một cách ngăn nắp. Ghi chú được đồng bộ hóa, có thể tìm kiếm được và có thể truy cập ở khắp nơi, nhờ đó bạn có thể dễ dàng tìm thấy những gì bạn cần. Tìm hiểu thêm!">
+    <meta name="keywords" content="">
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @RenderSection("stylesheet", required: false)
+</head>
+<body>
+    <header class="writenote-header">
+        <div class="top">
+            <div class="row">
+                <div class="writenote-logo">
+                    <a href="@Url.Action("Index", "Home")">
+                        <img src="@Url.Content("~/Content/img/logo.png")" alt="Writenote" class="img-logo" />
+                    </a>
+                </div>
+                <nav class="top-level-nav">
+                    <ul>
+                        <li>
+                            <a href="#">Các gói cơ bản</a><span class="arrow"></span>
+                            <div class="sub-nav" style="overflow-y: visible;">
+                                <div class="sub-nav-col left">
+                                    <a href="@Url.Action("Index", "Basic")" class="sub-nav-box">
+                                        <div class="plans basic" style="background-image:url('@Url.Content("~/Content/img/basic.svg")')"></div>
+                                        <h4>Basic</h4>
+                                        <p>Ghi chú hiệu quả</p>
+                                    </a>
+                                    <a href="#" class="sub-nav-box">
+                                        <div class="plans premium" style="background-image:url('@Url.Content("~/Content/img/premium.svg")')"></div>
+                                        <h4>Premium</h4>
+                                        <p>Tinh giản cuộc sống của bạn</p>
+                                    </a>
+                                    <a href="#" class="sub-nav-box">
+                                        <div class="plans business" style="background-image:url('@Url.Content("~/Content/img/business.svg")')"></div>
+                                        <h4>Business</h4>
+                                        <p>Giúp nhóm thống nhất với nhau</p>
+                                    </a>
+                                </div>
+                                <div class="sub-nav-col right">
+                                    <a href="@Url.Action("ComparePlans", "Home", new { area = "" })" class="sub-nav-box vert">
+                                        <div class="plans compare" style="background-image:url('@Url.Content("~/Content/img/compare.svg")')"></div>
+                                        <h4>So sánh các gói thuê bao</h4>
+                                        <p>Evernote cung cấp đủ giải pháp phù hợp với nhu cầu của bạn</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <a class="non-linked">Tính năng</a><span class="arrow"></span>
+                            <div class="sub-nav" style="overflow-y: visible;">
+                                <div class="sub-nav-col left">
+                                    <a href="#" class="sub-nav-box">
+                                        <div class="plans " style="background-image:url('https://evernote.com/c/assets/header/web-clipper.svg')"></div>
+                                        <h4>Web Clipper</h4>
+                                        <p>Nút lưu cho web</p>
+                                    </a>
+                                    <a href="#" class="sub-nav-box">
+                                        <div class="plans" style="background-image:url('https://evernote.com/c/assets/header/templates.svg')"></div>
+                                        <h4>Mẫu</h4>
+                                        <p>Ghi chú hiệu quả hơn, nhanh hơn</p>
+                                    </a>
+                                    <a href="#" class="sub-nav-box">
+                                        <div class="plans" style="background-image:url('https://evernote.com/c/assets/header/note-sync.svg')"></div>
+                                        <h4>Đồng bộ hóa ghi chú</h4>
+                                        <p>Giữ ghi chú ở một nơi thuận tiện</p>
+                                    </a>
+                                </div>
+                                <div class="sub-nav-col right">
+                                    <a href="#" class="sub-nav-box">
+                                        <div class="plans" style="background-image:url('https://evernote.com/c/assets/header/search-handwriting.svg')"></div>
+                                        <h4>Tìm kiếm chữ viết tay</h4>
+                                        <p>Tìm thấy văn bản trong mọi ghi chú</p>
+                                    </a>
+                                    <a href="#" class="sub-nav-box">
+                                        <div class="plans" style="background-image:url('https://evernote.com/c/assets/header/notebooks-tags.svg')"></div>
+                                        <h4>Sổ tay &amp; thẻ</h4>
+                                        <p>Sắp xếp theo cách của bạn</p>
+                                    </a>
+                                    <a href="#" class="sub-nav-box">
+                                        <div class="plans" style="background-image:url('https://evernote.com/c/assets/header/integrations.svg')"></div>
+                                        <h4>Tích hợp</h4>
+                                        <p>Kết nối với các ứng dụng yêu thích</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                        <li><a href="@Url.Action("Index", "Contact", new { area = "" })">Liên hệ</a></li>
+                        <li><a href="@Url.Action("About", "Home", new { area = "" })">Về chúng tôi</a></li>
+                    </ul>
+                </nav>
+                <nav class="utility-nav">
+                    @Html.Partial("_AuthView")
+                </nav>
+            </div>
+        </div>
+    </header>
+    @RenderBody()
+    <footer>
+        <div class="footer-menu">
+            <div class="container">
+                <div class="row">
+                    <div class="col-8">
+                        <div class="col text">
+                            <h2 class="title">Đăng ký Writenote ngay hôm nay</h2>
+                            <div class="description">Nắm bắt ý tưởng và cảm hứng ở khắp mọi nơi và quản lý nhiệm vụ một cách dễ dàng.</div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="col form">
+                            <div class="form-row copyright">
+                                <p>Copyright</p>&nbsp;<span>©</span>&nbsp;<p class="name">NoobTeam</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/function")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

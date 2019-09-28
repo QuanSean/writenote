@@ -1,0 +1,159 @@
+﻿@{
+    ViewBag.Title = "Liên hệ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section stylesheet
+{
+    <link href="@Url.Content("~/Content/css/sweetalert2.min.css")" rel="stylesheet" />
+}
+<div class="info-card-component colored-background grey">
+    <div class="contact-form">
+        <div class="controls">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="inputName">Tên của bạn *</label>
+                        <input id="inputName" type="text" name="inputName" class="form-control" placeholder="Nhập tên của bạn *" required="required">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="inputEmail">Email *</label>
+                        <input id="inputEmail" type="email" name="inputEmail" class="form-control" placeholder="Nhập Email *" required="required">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label for="inputBody">Nội dung *</label>
+                        <textarea id="inputBody" name="inputBody" class="form-control" placeholder="Gửi phản hồi cho chúng tôi *" rows="4" required="required"></textarea>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <input type="submit" class="btn btn-success btn-send" value="Gửi phản hồi" id="send-email">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <p class="text-muted">
+                        <strong>*</strong> Các trường bắt buộc phải nhập nội dung.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="map"></div>
+@section scripts
+{
+    <script src="@Url.Content("~/Content/js/sweetalert2.min.js")"></script>
+    <script>
+        "use strict";
+        var wrapper = $(".contact-form");
+        var errorMessage = function (element, text) {
+            let wrapper = $(".contact-form " + element);
+            $(wrapper).find(".animate-alert").remove();
+            if (!$(wrapper).find(".animate-alert").length) {
+                $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">" + text + "</div>"));
+            }
+            else {
+                $(wrapper).find(".animate-alert").remove();
+            }
+        }
+
+        $(document).ready(function () {
+            $("#send-email").on("click", function (e) {
+                e.preventDefault();
+                $(wrapper).find(".animate-alert").remove();
+                var inputName = $("input[id='inputName']").val();
+                var inputEmail = $("input[id='inputEmail']").val();
+                var inputBody = $("textarea[id='inputBody']").val();
+
+                if (inputName.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputName", "Tên của bạn không đuợc để trống");
+                    return false;
+                }
+                else if (inputEmail.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputEmail", "Email của bạn không đuợc để trống");
+                    return false;
+                }
+                else if (IsEmail(inputEmail) == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputEmail", "Email không hợp lệ.");
+                    return false;
+                }
+                else if (inputBody.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputBody", "Nội dung của bạn không đuợc để trống");
+                    return false;
+                }
+                else {
+                    $(wrapper).find(".animate-alert").remove();
+                    $.ajax({
+                        url: '@Url.Action("SendEmail", "Contact", new { area = "" })',
+                        data: { "name": inputName, "body": inputBody, "email": inputEmail },
+                        type: 'POST',
+                        dataType: 'json',
+                        beforeSend: function () {
+                            swal({
+                                text: "Đang gửi phản hồi...",
+                                onOpen: () => {
+                                    swal.showLoading()
+                                }
+                            })
+                        },
+                        success: function (response) {
+                            if (response.status) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Phản hồi của bạn đã được gửi đi",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Client/Home"
+                                })
+                            }
+                            else {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Có lỗi, vui lòng thử lại...",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    });
+                    return false;
+                }
+            });
+        })
+    </script>
+    <script>
+        "use strict"
+        var map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: 10.80216567, lng: 106.71483189 },
+                zoom: 20
+            });
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB-z-8yW-DBciiWQfKAKupQ7q2w4I_FFGY&callback=initMap" async defer></script>
+}

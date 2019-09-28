@@ -1,0 +1,261 @@
+﻿@using WriteNote.Models
+@using WriteNote.Models.ViewModels;
+@{
+    int UserID = int.Parse(HttpContext.Current.Session["UserID"].ToString());
+    WNDatabaseContext _dbContext = new WNDatabaseContext();
+    var userData = _dbContext.Users.Where(u => u.UserID == UserID).Where(u => u.RoleID == 1).FirstOrDefault();
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="phutruongck">
+    <meta name="author" content="phutruongck">
+    <meta name="keywords" content="phutruongck">
+    <title>@ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/Admin/css/font-face.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/font-awesome-4.7/css/font-awesome.min.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/font-awesome-5/css/fontawesome-all.min.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/mdi-font/css/material-design-iconic-font.min.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/css/sweetalert2.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/Admin/vendor/bootstrap-4.1/bootstrap.min.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/animsition/animsition.min.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/bootstrap-progressbar/bootstrap-progressbar-3.3.4.min.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/wow/animate.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/css-hamburgers/hamburgers.min.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/slick/slick.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/select2/select2.min.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/vendor/perfect-scrollbar/perfect-scrollbar.css")" rel="stylesheet" media="all">
+    <link href="@Url.Content("~/Content/Admin/css/theme.css")" rel="stylesheet" media="all">
+</head>
+
+<body>
+    <div class="loader" id="pressData" style="display:none;"><div class="strip-holder"><div class="strip-1"></div><div class="strip-2"></div><div class="strip-3"></div></div></div>
+    <div class="page-wrapper">
+        <header class="header-desktop3 d-none d-lg-block">
+            <div class="section__content section__content--p35">
+                <div class="header3-wrap">
+                    <div class="header__logo">
+                        <a href="@Url.Action("Index", "Home", new { area = "Admin" })">
+                            <img src="@Url.Content("~/Content/img/logo-client.png")" alt="WriteNote" />
+                        </a>
+                    </div>
+                    <div class="header__navbar">
+                        <ul class="list-unstyled">
+                            <li>
+                                <a href="@Url.Action("Index", "Home", new { area = "Admin" })">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span class="bot-line"></span>TỔNG QUAN
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "User", new { area = "Admin" })">
+                                    <i class="fas fa-users"></i>
+                                    <span class="bot-line"></span>NGƯỜI DÙNG
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "Note", new { area = "Admin" })">
+                                    <i class="fas fa-book"></i>
+                                    <span class="bot-line"></span>NHẬT KÝ
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "Notebook", new { area = "Admin" })">
+                                    <i class="fas fa-flag"></i>
+                                    <span class="bot-line"></span>SỔ TAY
+                                </a>
+                            </li>
+                            <li>
+                                <a href="@Url.Action("Index", "Home", new { area = "Client" })">
+                                    <i class="fas fa-arrow-circle-left"></i>
+                                    <span class="bot-line"></span>QUAY LẠI
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="header__tool">
+                        <div class="account-wrap">
+                            <div class="account-item account-item--style2 clearfix js-item-menu">
+                                <div class="image">
+                                    <img src="@Url.Content("~/Content/Admin/images/icon/boy.png")" alt="John Doe" />
+                                </div>
+                                <div class="content">
+                                    <a class="js-acc-btn" href="#">@userData.Username</a>
+                                </div>
+                                <div class="account-dropdown js-dropdown">
+                                    <div class="info clearfix">
+                                        <div class="image">
+                                            <a href="#">
+                                                <img src="@Url.Content("~/Content/Admin/images/icon/boy.png")" alt="@userData.Fullname" />
+                                            </a>
+                                        </div>
+                                        <div class="content">
+                                            <h5 class="name">
+                                                <a href="#">@userData.Username</a>
+                                            </h5>
+                                            <span class="email">@userData.Email</span>
+                                        </div>
+                                    </div>
+                                    <div class="account-dropdown__body">
+                                        <div class="account-dropdown__item">
+                                            <a href="#">
+                                                <i class="zmdi zmdi-account"></i>Account
+                                            </a>
+                                        </div>
+                                        <div class="account-dropdown__item">
+                                            <a href="#">
+                                                <i class="zmdi zmdi-settings"></i>Setting
+                                            </a>
+                                        </div>
+                                        <div class="account-dropdown__item">
+                                            <a href="#">
+                                                <i class="zmdi zmdi-money-box"></i>Billing
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="account-dropdown__footer">
+                                        <a href="@Url.Action("Logout", "Account", new { area="" })">
+                                            <i class="zmdi zmdi-power"></i>Logout
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <header class="header-mobile header-mobile-2 d-block d-lg-none">
+            <div class="header-mobile__bar">
+                <div class="container-fluid">
+                    <div class="header-mobile-inner">
+                        <a class="logo" href="@Url.Action("Index", "Home", new { area = "Admin" })">
+                            <img src="@Url.Content("~/Content/img/logo-client.png")" alt="WriteNote" />
+                        </a>
+                        <button class="hamburger hamburger--slider" type="button">
+                            <span class="hamburger-box">
+                                <span class="hamburger-inner"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <nav class="navbar-mobile">
+                <div class="container-fluid">
+                    <ul class="navbar-mobile__list list-unstyled">
+                        <li class="has-sub">
+                            <a class="js-arrow" href="@Url.Action("Index", "Home", new { area = "Admin" })">
+                                <i class="fas fa-tachometer-alt"></i>TỔNG QUAN
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Index", "User", new { area = "Admin" })">
+                                <i class="fas fa-users"></i>NGƯỜI DÙNG
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Index", "Note", new { area = "Admin" })">
+                                <i class="fas fa-book"></i>NHẬT KÝ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Index", "Notebook", new { area = "Admin" })">
+                                <i class="fas fa-flag"></i>SỔ TAY
+                            </a>
+                        </li>
+                        <li>
+                            <a href="@Url.Action("Index", "Home", new { area = "Client" })">
+                                <i class="fas fa-arrow-circle-left"></i>QUAY LẠI
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <div class="sub-header-mobile-2 d-block d-lg-none">
+            <div class="header__tool">
+                <div class="account-wrap">
+                    <div class="account-item account-item--style2 clearfix js-item-menu">
+                        <div class="image">
+                            <img src="@Url.Content("~/Content/Admin/images/icon/boy.png")" alt="John Doe" />
+                        </div>
+                        <div class="content">
+                            <a class="js-acc-btn" href="#">john doe</a>
+                        </div>
+                        <div class="account-dropdown js-dropdown">
+                            <div class="info clearfix">
+                                <div class="image">
+                                    <a href="#">
+                                        <img src="@Url.Content("~/Content/Admin/images/icon/boy.png")" alt="John Doe" />
+                                    </a>
+                                </div>
+                                <div class="content">
+                                    <h5 class="name">
+                                        <a href="#">john doe</a>
+                                    </h5>
+                                    <span class="email">johndoe@example.com</span>
+                                </div>
+                            </div>
+                            <div class="account-dropdown__body">
+                                <div class="account-dropdown__item">
+                                    <a href="#">
+                                        <i class="zmdi zmdi-account"></i>Account
+                                    </a>
+                                </div>
+                                <div class="account-dropdown__item">
+                                    <a href="#">
+                                        <i class="zmdi zmdi-settings"></i>Setting
+                                    </a>
+                                </div>
+                                <div class="account-dropdown__item">
+                                    <a href="#">
+                                        <i class="zmdi zmdi-money-box"></i>Billing
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="account-dropdown__footer">
+                                <a href="#">
+                                    <i class="zmdi zmdi-power"></i>Logout
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-content--bgf7">
+            @RenderBody()
+            <section class="p-t-60 p-b-20">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="copyright">
+                                <p>Copyright © 2019 <a href="https://facebook.com/phutruongck">NOOBTEAM</a>. All rights reserved.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script src="@Url.Content("~/Content/Admin/vendor/jquery-3.2.1.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/bootstrap-4.1/popper.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/bootstrap-4.1/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/slick/slick.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/wow/wow.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/bootstrap-progressbar/bootstrap-progressbar.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/counter-up/jquery.waypoints.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/counter-up/jquery.counterup.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/circle-progress/circle-progress.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/perfect-scrollbar/perfect-scrollbar.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/chartjs/Chart.bundle.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/vendor/select2/select2.min.js")"></script>
+    <script src="@Url.Content("~/Content/js/sweetalert2.min.js")"></script>
+    <script src="@Url.Content("~/Content/Admin/js/main.js")"></script>
+    <script src="@Url.Content("~/Content/js/function.js")"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>

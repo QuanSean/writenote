@@ -1,0 +1,151 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title | WriteNote</title>
+    <meta name="description" content="Writenote là ứng dụng giúp sắp xếp ghi chú của bạn một cách ngăn nắp. Ghi chú được đồng bộ hóa, có thể tìm kiếm được và có thể truy cập ở khắp nơi, nhờ đó bạn có thể dễ dàng tìm thấy những gì bạn cần. Tìm hiểu thêm!">
+    <meta name="keywords" content="">
+    <link href="@Url.Content("~/Content/bootstrap/css/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/css/truong.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/css/sweetalert2.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/css/floatinglabel.css")" rel="stylesheet" />
+</head>
+<body class="text-center">
+    <div class="container">
+        <div class="signin-content">
+            <div class="header">
+                <div class="logo">
+                    <a href="/Home/Index"><img src="@Url.Content("~/Content/img/logo.png")" alt="Writenote" /></a>
+                </div>
+                <p class="tagline">Ghi nhớ mọi thứ quan trọng.</p>
+            </div>
+            <form class="form-signin" onsubmit="return false;">
+                <div class="form-label-group">
+                    <input type="email" id="inputEmail" class="form-control" placeholder="Email" autofocus="">
+                    <label for="inputEmail">Email</label>
+                </div>
+                <div class="form-label-group">
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Mật khẩu">
+                    <label for="inputPassword">Mật khẩu</label>
+                </div>
+                <div class="form-label-group">
+                    <input type="password" id="inputRePassword" class="form-control" placeholder="Nhập lại mật khẩu">
+                    <label for="inputRePassword">Nhập lại mật khẩu</label>
+                </div>
+                <button class="btn btn-lg btn-block btn-outline-danger" id="signup">Đăng ký</button>
+            </form>
+            <div class="rules">
+                <p>Bằng việc tạo một tài khoản, bạn đồng ý với <span class="dieukhoan">Điều khoản dịch vụ</span> và <span class="chinhsach">Chính sách về Quyền riêng tư.</span>
+            </div>
+            <div class="signup">
+                <div class="context-switch-signup">
+                    Bạn đã có tài khoản?
+                </div>
+                <div class="signup-context">
+                    @Html.ActionLink("Đăng nhập", "Login", "Account", null, new { @class = "button-outline" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="@Url.Content("~/Content/js/jquery.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap/js/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Content/js/sweetalert2.min.js")"></script>
+    <script src="@Url.Content("~/Content/js/function.js")"></script>
+    <script>
+        $(document).ready(function () {
+            deleteSomee();
+            const wrapper = $(".form-signin>.form-label-group");
+            const inputEmail = $("input[type='email']");
+            const inputPassword = $("input[type='password']");
+            const inputRePassword = $("input[id='inputRePassword']");
+
+            $("button#signup").on("click", function (e) {
+                e.preventDefault();
+                if (inputEmail.val().length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errMess("inputEmail", "Bạn chưa nhập Email.");
+                    return false;
+                }
+                else if (IsEmail(inputEmail.val()) == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errMess("inputEmail", "Email không hợp lệ.");
+                    return false;
+                }
+                else if (inputPassword.val().length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errMess("inputPassword", "Bạn chưa nhập mật khẩu.");
+                    return false;
+                }
+                else if (inputPassword.val().length < 6) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errMess("inputPassword", "Mật khẩu phải trên 6 ký tự.");
+                    return false;
+                }
+                else if (inputRePassword.val().length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errMess("inputRePassword", "Bạn chưa nhập xác nhận mật khẩu.");
+                    return false;
+                }
+                else if (inputPassword.val() !== inputRePassword.val()) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errMess("inputRePassword", "Mật khẩu xác nhận không trùng khớp.");
+                    return false;
+                }
+                else {
+                    $(wrapper).find(".animate-alert").remove();
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Account/Register",
+                        data: { "Mail": inputEmail.val(), "passwd": inputPassword.val() },
+                        beforeSend: function () {
+                            swal({
+                                text: "Đang đăng ký ...",
+                                onOpen: () => {
+                                    swal.showLoading()
+                                }
+                            })
+                        },
+                        success: function (response) {
+                            if (response.status == true) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Đăng ký thành công",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Account/Login"
+                                })
+                            }
+                            else {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Email đã có người sử dụng",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    });
+                    return false;
+                }
+            });
+        })
+    </script>
+</body>
+</html>

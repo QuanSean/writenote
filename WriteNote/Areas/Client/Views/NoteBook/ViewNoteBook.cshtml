@@ -1,0 +1,193 @@
+﻿@{
+    ViewBag.Title = "ViewNoteBook";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+
+
+    string notebookID;
+
+    try
+    {
+        notebookID = Html.ViewContext.RouteData.Values["id"].ToString();
+    }
+    catch (Exception ex)
+    {
+        notebookID = "";
+    }
+}
+<div class="section light-bg">
+    <div class="container">
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#note">Ghi chú</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#edit">Thao tác</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="note">
+                <div class="d-flex flex-column flex-lg-row">
+                    <div class="view-note">
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="edit">
+                <div class="d-flex flex-column">
+                    <div class="edit-notebook">
+                        <div class="md-form mt-3">
+                            <input type="text" id="inputTitle" name="inputTitle" class="form-control" autofocus>
+                            <label for="inputTitle">Tiêu đề</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex flex-column flex-lg-row">
+                    <button class="btn btn-primary" id="update-notebook">Cập nhật</button>
+                    <button class="btn btn-primary" id="delete-notebook">Xoá</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <script>
+        "use strict";
+        var notebookID = parseInt("@notebookID");
+        $(document).ready(function () {
+            $.ajax({
+                type: "POST",
+                dataType: "json",
+                url: "/Client/NoteBook/ViewNoteBook",
+                data: { "notebookID": notebookID },
+                success: function (response) {
+                    if (response.data) {
+                        $(".view-note").append("<h2>" + response.data.Title + "</h2>");
+                        $(".edit-notebook input[type='text']").val(response.data.Title);
+                    }
+                    else {
+                        $(".view-note").append("<h2>Sổ tay không tồn tại</h2><p></p>");
+                    }
+                }
+            })
+            return false;
+        })
+
+        $(document).ajaxStart(function () {
+            $("#pressData").show();
+        });
+
+        $(document).ajaxStop(function () {
+            $("#pressData").hide();
+        });
+
+        $(document).ready(function () {
+            $("#update-notebook").on("click", function () {
+                var inputTitle = $("#inputTitle").val();
+
+                if (inputTitle == 0) {
+                    let wrapper = $(".edit-notebook");
+                    $(wrapper).find(".animate-alert").remove();
+                    if (!$(wrapper).find(".animate-alert").length) {
+                        $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">Tên sổ tay không được để trống</div>"));
+                    }
+                    else {
+                        $(wrapper).find(".animate-alert").remove();
+                    }
+                    return false;
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Client/NoteBook/UpdateNoteBook",
+                        data: { "notebookID": notebookID, "title": inputTitle },
+                        success: function (response) {
+                            if (response.status == 1) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Cập nhật thành công",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Client/NoteBook"
+                                })
+                            }
+                            else if (response.status == 2) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Sổ tay không tồn tại",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        },
+                        error: function () {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    })
+                    return false;
+                }
+            })
+        })
+
+        $(document).ready(function () {
+            $("#delete-notebook").on("click", function () {
+                $.ajax({
+                    type: "POST",
+                    dataType: "json",
+                    url: "/Client/NoteBook/DeleteNoteBook",
+                    data: { "notebookID": notebookID },
+                    success: function (response) {
+                        if (response.status == 1) {
+                            Swal.fire({
+                                position: "center",
+                                type: "success",
+                                title: "Xoá thành công",
+                                showConfirmButton: false,
+                                timer: 1000
+                            }).then(function () {
+                                window.location.href = "/Client/NoteBook"
+                            })
+                        }
+                        else if (response.status == 2) {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có lỗi, vui lòng thử lại...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                        else if (response.status == 3) {
+                            Swal.fire({
+                                position: "center",
+                                type: "error",
+                                title: "Có nhật ký thuộc sổ tay này, vui lòng xoá hết nhật ký trước...",
+                                showConfirmButton: false,
+                                timer: 1000
+                            })
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({
+                            position: "center",
+                            type: "error",
+                            title: "Có lỗi, vui lòng thử lại...",
+                            showConfirmButton: false,
+                            timer: 1000
+                        })
+                    }
+                })
+                return false;
+            })
+        })
+    </script>
+}

@@ -1,0 +1,61 @@
+﻿
+@{
+    ViewBag.Title = "Cửa hàng";
+    ViewBag.Shop = "active";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+}
+<div class="section" id="pricing">
+    <div class="container">
+        <div class="section-title">
+            <small>BẢNG GIÁ</small>
+            <h3>NÂNG CẤP LÊN PRO</h3>
+        </div>
+        <div class="card-deck">
+            <div class="card pricing">
+                <div class="card-head">
+                    <small class="text-primary">CƠ BẢN</small>
+                    <span class="price">0<sub>K/m</sub></span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <div class="list-group-item">10 nhật ký</div>
+                    <div class="list-group-item">2 sổ tay</div>
+                    <div class="list-group-item">Hỗ trợ cơ bản</div>
+                    <div class="list-group-item"><del>Báo cáo và thống kê</del></div>
+                </ul>
+                <div class="card-body">
+                    <a href="@Url.Action("AddToCart", "Shop", new { area = "Client", id = "1" })" class="btn btn-primary btn-lg btn-block"><del>ĐĂNG KÝ GÓI NÀY</del></a>
+                </div>
+            </div>
+            <div class="card pricing popular">
+                <div class="card-head">
+                    <small class="text-primary">NÂNG CAO</small>
+                    <span class="price">50<sub>K/m</sub></span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <div class="list-group-item">100 nhật ký</div>
+                    <div class="list-group-item">50 sổ tay</div>
+                    <div class="list-group-item">Hỗ trợ tận tình</div>
+                    <div class="list-group-item">Báo cáo và thống kê</div>
+                </ul>
+                <div class="card-body">
+                    <a href="@Url.Action("AddToCart", "Shop", new { area = "Client", id = "2" })" class="btn btn-primary btn-lg btn-block">ĐĂNG KÝ GÓI NÀY</a>
+                </div>
+            </div>
+            <div class="card pricing">
+                <div class="card-head">
+                    <small class="text-primary">CAO CẤP</small>
+                    <span class="price">100<sub>K/m</sub></span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <div class="list-group-item">Không giới hạn nhật ký</div>
+                    <div class="list-group-item">Không giới hạn sổ tay</div>
+                    <div class="list-group-item">Hỗ trợ tận răng</div>
+                    <div class="list-group-item">Báo cáo và thống kê</div>
+                </ul>
+                <div class="card-body">
+                    <a href="@Url.Action("AddToCart", "Shop", new { area = "Client", id = "3" })" class="btn btn-primary btn-lg btn-block">ĐĂNG KÝ GÓI NÀY</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

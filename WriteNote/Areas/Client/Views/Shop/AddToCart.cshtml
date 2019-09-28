@@ -1,0 +1,164 @@
+﻿
+@{
+    ViewBag.Title = "Giỏ hàng";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+
+    string subscriptionID;
+
+    try
+    {
+        subscriptionID = Html.ViewContext.RouteData.Values["id"].ToString();
+    }
+    catch (Exception)
+    {
+        subscriptionID = "";
+    }
+}
+
+<div class="section light-bg">
+    <div class="container">
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#infoPay">XÁC NHẬN</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="infoPay">
+                <div class="d-flex flex-column">
+                    <div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputEmail">Email</label>
+                                <input type="email" class="form-control" id="inputEmail" placeholder="Email" disabled>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputFullname">Tên đầy đủ</label>
+                                <input type="text" class="form-control" id="inputFullname" placeholder="Fullname" disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputSubscription">GÓI ĐĂNG KÝ</label>
+                                <input type="text" class="form-control" id="inputSubscription" disabled>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputPrice">GIÁ</label>
+                                <input type="text" class="form-control" id="inputPrice" disabled>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="inputCount">Số tháng</label>
+                                <input type="number" class="form-control" id="inputCount">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="inputTotal">Thành giá</label>
+                                <input type="text" class="form-control" id="inputTotal" disabled>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="pay">Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        "use strict";
+        var SubscriptionID = '@subscriptionID';
+        var errorMessage = function (element, text) {
+            let wrapper = $("#infoPay " + element);
+            $(wrapper).find(".animate-alert").remove();
+            if (!$(wrapper).find(".animate-alert").length) {
+                $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">" + text + "</div>"));
+            }
+            else {
+                $(wrapper).find(".animate-alert").remove();
+            }
+        }
+
+        $(document).ready(function () {
+            $.ajax({
+                url: "/Client/Shop/AddToCart",
+                data: { "flag": true, "subscriptionID": SubscriptionID},
+                type: "POST",
+                dataType: "json",
+                success: function (response) {
+                    $("#infoPay").find("input[id='inputEmail']").val(response.datauser.Email);
+                    $("#infoPay").find("input[id='inputFullname']").val(response.datauser.Fullname);
+                    $("#infoPay").find("input[id='inputSubscription']").val(response.datasub.SubscriptionName);
+                    $("#infoPay").find("input[id='inputPrice']").val(response.datasub.Price);
+                }
+            })
+        });
+
+        $(document).ready(function () {
+            $("#inputCount").on("keyup", function () {
+                if ($(this).val() > -1) {
+                    var price = $("#infoPay").find("input[id='inputPrice']").val();
+                    var count = $("#inputCount").val();
+                    var allTotal = price * count;
+                    $("#inputTotal").val(allTotal + " VND");
+                }
+                else {
+                    Swal.fire({
+                        position: "center",
+                        type: "error",
+                        title: "Số tháng bạn nhập chưa đúng",
+                        showConfirmButton: false,
+                        timer: 1000
+                    })
+                }
+            });
+
+            $(document).ready(function () {
+                $("#pay").on("click", function (e) {
+                    e.preventDefault();
+                    let wrapper = $("#infoPay");
+                    $(wrapper).find(".animate-alert").remove();
+
+                    var inputEmail = $("#inputEmail").val();
+                    var inputFullname = $("#inputFullname").val();
+                    var inputPrice = $("#inputPrice").val();
+                    var inputCount = $("#inputCount").val();
+
+                    if (inputCount <= 0) {
+                        $(wrapper).find(".animate-alert").remove();
+                        errorMessage("#inputCount", "Số tháng không hợp lệ");
+                        return false;
+                    }
+                    else if (inputCount.length == false) {
+                        $(wrapper).find(".animate-alert").remove();
+                        $("#inputTotal").val('');
+                        errorMessage("#inputCount", "Số tháng không được để trống");
+                        return false;
+                    }
+                    else {
+                        $.ajax({
+                            url: "/Client/Shop/Confirm",
+                            data: { "subscriptionID": SubscriptionID, "price": inputPrice, "count": inputCount },
+                            dataType: "json",
+                            type: "POST",
+                            success: function (response) {
+                                if (response.status) {
+                                    Swal.fire({
+                                        position: "center",
+                                        type: "success",
+                                        title: "Xác nhận thành công",
+                                        showConfirmButton: false,
+                                        timer: 1000
+                                    }).then(function () {
+                                        window.location.href = "/Client/Shop/Cart"
+                                    })
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+        })
+    </script>
+}

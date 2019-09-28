@@ -1,0 +1,156 @@
+﻿
+@{
+    ViewBag.Title = "Thống kê";
+    Layout = "~/Areas/Client/Views/Shared/_Layout.cshtml";
+}
+<div class="section light-bg">
+    <div class="container">
+        <ul class="nav nav-tabs nav-justified" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#statistic">Thống kê</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#subscription">Lịch sử nâng cấp</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="statistic">
+                <div class="d-flex flex-column">
+                    <div class="view-statistic">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="stat-widget-five">
+                                            <div class="stat-icon dib flat-color-1">
+                                                <i class="far fa-sticky-note"></i>
+                                            </div>
+                                            <div class="stat-content">
+                                                <div class="text-left dib" id="note">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="stat-widget-five">
+                                            <div class="stat-icon dib flat-color-2">
+                                                <i class="fas fa-book"></i>
+                                            </div>
+                                            <div class="stat-content">
+                                                <div class="text-left dib" id="notebook">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="stat-widget-five">
+                                            <div class="stat-icon dib flat-color-3">
+                                                <i class="fas fa-recycle"></i>
+                                            </div>
+                                            <div class="stat-content">
+                                                <div class="text-left dib" id="notedelete">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="stat-widget-five">
+                                            <div class="stat-icon dib flat-color-4">
+                                                <i class="fas fa-shopping-cart"></i>
+                                            </div>
+                                            <div class="stat-content">
+                                                <div class="text-left dib" id="pay">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane fade show" id="subscription">
+                <div class="d-flex flex-column">
+                    <div class="view-subscription">
+                        <table class="table table-data2">
+                            <thead>
+                                <tr>
+                                    <th>Subscription</th>
+                                    <th>Price</th>
+                                    <th>Month</th>
+                                    <th>DateTime Buy</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        "use strict";
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Client/Statistic',
+                data: { "flag": true },
+                type: "POST",
+                dataType: "json",
+                success: function (response) {
+                    $("#note").append("<div class=\"stat-text\"><span class=\"count\">" + response.note + "</span></div><div class=\"stat-heading\">Nhật ký</div>");
+                    $("#notebook").append("<div class=\"stat-text\"><span class=\"count\">" + response.notebook + "</span></div><div class=\"stat-heading\">Sổ tay</div>");
+                    $("#notedelete").append("<div class=\"stat-text\"><span class=\"count\">" + response.deleted + "</span></div><div class=\"stat-heading\">Thùng rác</div>");
+                    $("#pay").append("<div class=\"stat-text\"><span class=\"count\">" + response.pay + "</span></div><div class=\"stat-heading\">Giao dịch</div>");
+                }
+            });
+            return false;
+        });
+
+        $(document).ready(function () {
+            $.ajax({
+                url: '/Client/Statistic/HistoryBought',
+                data: { "flag": true },
+                type: "POST",
+                dataType: "json",
+                success: function (response) {
+                    if (response.status) {
+                        console.log(response.data)
+                        var allElement = "";
+                        $.each(response.data, function (i) {
+                            let datetimeBought = new Date(parseInt(response.data[i].DatetimeBought.replace(/\/Date\((-?\d+)\)\//, '$1')));
+                            let element1 = "<tr>";
+                            let element2 = "<td>" + response.data[i].SubscriptionName + "</td>";
+                            let element3 = "<td>" + response.data[i].Price + "</td>";
+                            let element4 = "<td>" + response.data[i].CountMonth + "</td>";
+                            let element5 = "<td>" + datetimeBought + "</td>";
+                            let element6 = "</tr>";
+                            allElement += element1 + element2 + element3 + element4 + element5 + element6;
+                        });
+                        $(".view-subscription>table>tbody").html(allElement);
+                    }
+                    else {
+                        alert("cscs");
+                    }
+                }
+            });
+            return false;
+        });
+    </script>
+}

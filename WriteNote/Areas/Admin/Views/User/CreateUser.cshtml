@@ -1,0 +1,184 @@
+﻿
+@{
+    ViewBag.Title = "Tạo người dùng mới";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<div class="container p-t-20">
+    <div class="card">
+        <div class="card-header">
+            <strong>Cập nhật thông tin</strong>
+        </div>
+        <div class="card-body card-block">
+            <form action="" method="post" enctype="multipart/form-data" class="form-horizontal" onsubmit="return false;">
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputUsername" class=" form-control-label">Username</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputUsername" name="inputUsername" placeholder="Username" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputPassword" class=" form-control-label">Password</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="password" id="inputPassword" name="inputPassword" placeholder="Password" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputEmail" class=" form-control-label">Email</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputEmail" name="inputEmail" placeholder="Email" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputFullname" class=" form-control-label">Fullname</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <input type="text" id="inputFullname" name="inputFullname" placeholder="Fullname" class="form-control">
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputRole" class=" form-control-label">Role</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <select name="inputRole" id="inputRole" class="form-control">
+                            @foreach (var i in ViewData["listRole"] as IEnumerable<WriteNote.Models.Role>)
+                            {
+                                <option value="@i.RoleID">@i.RoleName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="inputSubscription" class=" form-control-label">Subscription</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <select name="inputSubscription" id="inputSubscription" class="form-control">
+                            @foreach (var i in ViewData["listSubscription"] as IEnumerable<WriteNote.Models.Subscription>)
+                            {
+                                <option value="@i.SubscriptionID">@i.SubscriptionName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary btn-sm" id="create-user">
+                <i class="fa fa-dot-circle-o"></i> Tạo mới
+            </button>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        "use strict";
+
+        var errorMessage = function (element, text) {
+            let wrapper = $(".card-body " + element);
+            $(wrapper).find(".animate-alert").remove();
+            if (!$(wrapper).find(".animate-alert").length) {
+                $(wrapper).after($("<div class=\"alert alert-danger animate-alert\" role=\"alert\">" + text + "</div>"));
+            }
+            else {
+                $(wrapper).find(".animate-alert").remove();
+            }
+        }
+
+        var wrapper = $(".card-body");
+        $(document).ready(function () {
+            $("#create-user").on("click", function (e) {
+                e.preventDefault();
+                $(wrapper).find(".animate-alert").remove();
+
+                var inputUsername = $("#inputUsername").val();
+                var inputEmail = $("#inputEmail").val();
+                var inputFullname = $("#inputFullname").val();
+                var inputPassword = $("#inputPassword").val();
+                var inputRole = $("#inputRole").val();
+                var inputSubscription = $("#inputSubscription").val();
+
+                if (inputUsername.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputUsername", "Tên người dùng không được để trống")
+                    return false;
+                }
+                else if (inputPassword.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputPassword", "Mật khẩu không được để trống");
+                    return false;
+                }
+                else if (inputPassword.length < 6) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputPassword", "Mật khẩu phải trên 6 ký tự.");
+                    return false;
+                }
+                else if (inputEmail.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputEmail", "Bạn chưa nhập Email.");
+                    return false;
+                }
+                else if (IsEmail(inputEmail) == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputEmail", "Email không hợp lệ.");
+                    return false;
+                }
+                else if (inputFullname.length == false) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputFullname", "Tên đầy đủ không được để trống");
+                    return false;
+                }
+                else if (inputRole == 0) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputRole", "Role không được để trống");
+                    return false;
+                }
+                else if (inputSubscription == 0) {
+                    $(wrapper).find(".animate-alert").remove();
+                    errorMessage("#inputSubscription", "Subscription không được để trống");
+                    return false;
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        dataType: "json",
+                        url: "/Admin/User/CreateUser",
+                        data: { "Username": inputUsername, "Fullname": inputFullname, "Email": inputEmail, "Password": inputPassword, "RoleID": inputRole, "SubscriptionID": inputSubscription },
+                        success: function (response) {
+                            if (response.status == true) {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "success",
+                                    title: "Tạo người dùng thành công",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                }).then(function () {
+                                    window.location.href = "/Admin/User"
+                                })
+                            }
+                            else {
+                                Swal.fire({
+                                    position: "center",
+                                    type: "error",
+                                    title: "Email đã tồn tại",
+                                    showConfirmButton: false,
+                                    timer: 1000
+                                })
+                            }
+                        }
+                    })
+                    return false;
+                }
+            })
+        })
+    </script>
+}

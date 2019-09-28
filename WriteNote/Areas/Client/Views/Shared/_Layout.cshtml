@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title | WriteNote</title>
+    <meta name="description" content="Writenote là ứng dụng giúp sắp xếp ghi chú của bạn một cách ngăn nắp. Ghi chú được đồng bộ hóa, có thể tìm kiếm được và có thể truy cập ở khắp nơi, nhờ đó bạn có thể dễ dàng tìm thấy những gì bạn cần. Tìm hiểu thêm!">
+    <meta name="keywords" content="">
+    <link href="@Url.Content("~/Content/bootstrap/css/bootstrap.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/css/sweetalert2.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/fontawesome-free/css/fontawesome-all.min.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/css/owl.carousel.min.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/modal/css/mdb.min.css")" rel="stylesheet">
+    <link href="@Url.Content("~/Content/css/themify-icons.css")" rel="stylesheet" />
+    <link href="@Url.Content("~/Content/css/style.css")" rel="stylesheet" />
+    @RenderSection("stylesheet", required: false)
+</head>
+<body data-spy="scroll" data-target="#navbar" data-offset="30">
+    <div class="loader" id="pressData" style="display:none;"><div class="strip-holder"><div class="strip-1"></div><div class="strip-2"></div><div class="strip-3"></div></div></div>
+    <div class="nav-menu fixed-top">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <nav class="navbar navbar-dark navbar-expand-lg">
+                        <a class="navbar-brand" href="@Url.Action("Index", "Home", new { area = "Client" })"><img src="@Url.Content("~/Content/img/logo-client.png")" class="img-fluid" alt="logo"></a> <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation"> <span class="navbar-toggler-icon"></span> </button>
+                        <div class="collapse navbar-collapse" id="navbar">
+                            <ul class="navbar-nav ml-auto">
+                                <li class="nav-item"><a class="nav-link @ViewBag.Search" href="@Url.Action("Index", "Search", new { area ="Client"})">SEARCH</a></li>
+                                <li class="nav-item"><a class="nav-link @ViewBag.Home" href="@Url.Action("Index", "Home", new { area ="Client"})">NOTES <span class="sr-only">(current)</span></a></li>
+                                <li class="nav-item"><a class="nav-link @ViewBag.NoteBook" href="@Url.Action("Index", "NoteBook", new { area ="Client"})">NOTEBOOK</a></li>
+                                <li class="nav-item"><a class="nav-link @ViewBag.NoteDelete" href="@Url.Action("Index", "NoteDelete", new { area ="Client"})">DELETED</a></li>
+                                <li class="nav-item"><a class="nav-link @ViewBag.Shop" href="@Url.Action("Index", "Shop", new { area = "Client" })">SHOP</a></li>
+                                <li class="nav-item"><a class="nav-link @ViewBag.Profile" href="@Url.Action("Index", "Profile", new { area ="Client"})">PROFILE</a></li>
+                                @Html.Partial("_RoleAccount")
+                                <li class="nav-item"><a href="@Url.Action("Logout", "Account", new { area = "" })" class="btn btn-outline-light my-3 my-sm-0 ml-lg-3">Logout</a></li>
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <header class="bg-gradient" id="home">
+        <div class="container mt-5">
+            <h1>VIẾT NHẬT KÝ - LƯU GIỮ TỪNG KỶ NIỆM</h1>
+        </div>
+        <div class="img-holder mt-5"><img src="@Url.Content("~/Content/img/graphic.png")" alt="phone" class="img-fluid"></div>
+    </header>
+    @RenderBody()
+    <footer class="my-5 text-center">
+        <p class="mb-2"><small>COPYRIGHT © 2019. ALL RIGHTS RESERVED. <a href="https://facebook.com/phutruongck">NOOBTEAM</a></small></p>
+        <small>
+            <a href="#" class="m-2">PRESS</a>
+            <a href="#" class="m-2">TERMS</a>
+            <a href="#" class="m-2">PRIVACY</a>
+        </small>
+    </footer>
+    <script src="@Url.Content("~/Content/js/jquery.min.js")"></script>
+    <script src="@Url.Content("~/Content/bootstrap/js/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Content/js/sweetalert2.min.js")"></script>
+    <script src="@Url.Content("~/Content/modal/js/mdb.min.js")"></script>
+    <script src="@Url.Content("~/Content/js/function.js")"></script>
+    @RenderSection("scripts", required: false)
+</body>
+</html>
